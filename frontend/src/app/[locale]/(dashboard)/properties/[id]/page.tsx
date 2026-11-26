@@ -1,10 +1,8 @@
 import { serverApi } from "@/lib/server-api";
-import { Property, Cost, PropertyBasePrice } from "@/types/api";
+import { Property, PropertyBasePrice } from "@/types/api";
 import { notFound } from "next/navigation";
 import { MapPin, ArrowLeft } from "lucide-react";
 import { Link } from "@/i18n/routing";
-import CostsTable from "@/components/CostsTable";
-import AddCostDialog from "@/components/AddCostDialog";
 import PropertyCalendar from "@/components/PropertyCalendar";
 import PricingRulesTable from "@/components/PricingRulesTable";
 import PropertyTabs from "@/components/PropertyTabs";
@@ -22,12 +20,6 @@ interface PageProps {
 async function getProperty(id: string): Promise<Property | null> {
     const res = await serverApi(`/properties/${id}`);
     if (!res.ok) return null;
-    return res.json();
-}
-
-async function getPropertyCosts(id: string): Promise<Cost[]> {
-    const res = await serverApi(`/properties/${id}/costs`);
-    if (!res.ok) return [];
     return res.json();
 }
 
@@ -52,9 +44,8 @@ export default async function PropertyDetailsPage({ params, searchParams }: Page
     ]);
     const tab = rawTab ?? "details";
 
-    const [property, costs, pricingRules, basePriceHistory] = await Promise.all([
+    const [property, pricingRules, basePriceHistory] = await Promise.all([
         getProperty(id),
-        getPropertyCosts(id),
         getPropertyPricingRules(id),
         getBasePriceHistory(id),
     ]);
@@ -109,18 +100,6 @@ export default async function PropertyDetailsPage({ params, searchParams }: Page
                                 <p className="text-sm text-white/40">{t('basePriceDescription')}</p>
                             </div>
                             <BasePriceCard property={property} currentBasePrice={currentBasePrice} />
-                        </section>
-
-                        {/* Costs Section */}
-                        <section>
-                            <div className="flex items-center justify-between mb-4">
-                                <div>
-                                    <h2 className="text-lg font-bold text-white/85">{t('costs')}</h2>
-                                    <p className="text-sm text-white/40">{t('costsDescription')}</p>
-                                </div>
-                                <AddCostDialog propertyId={property.id} />
-                            </div>
-                            <CostsTable costs={costs} propertyId={property.id} />
                         </section>
                     </div>
                 )}

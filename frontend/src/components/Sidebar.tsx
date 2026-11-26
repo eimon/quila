@@ -82,7 +82,7 @@ export default function Sidebar({ userRole }: { userRole: string | null }) {
                                         className={`mr-3 flex-shrink-0 h-5 w-5 transition-colors ${isActive ? "text-brand-primary" : "text-white/35 group-hover:text-white/60"
                                             }`}
                                     />
-                                    {t(item.name as any)}
+                                    {t(item.name)}
                                 </Link>
                             );
                         })}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useEffect, useState } from "react";
+import { useReducer, useEffect } from "react";
 import { CalendarDay } from "@/types/api";
 import { Loader2, X } from "lucide-react";
 import { getCalendarData } from "@/actions/calendar";
@@ -9,6 +9,7 @@ import { useActionState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import CalendarHeader from "@/components/CalendarHeader";
 import CalendarDayCell from "@/components/CalendarDayCell";
+import PricingAdjustmentFields from "@/components/PricingAdjustmentFields";
 import { formatPrice } from "@/lib/utils";
 
 // --- Selection state ---
@@ -112,8 +113,6 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
         refreshTrigger: 0,
     });
 
-    const [calendarProfitability, setCalendarProfitability] = useState(100);
-
     // Notify parent whenever selection changes (booking mode)
     useEffect(() => {
         if (onRangeSelected && (selection.selectionStart || selection.selectionEnd)) {
@@ -131,7 +130,6 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
         if (result.success) {
             dispatchSelection({ type: 'RESET_SELECTION' });
             dispatchData({ type: 'TRIGGER_REFRESH' });
-            setCalendarProfitability(100);
         }
         return result;
     };
@@ -193,7 +191,7 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
         for (let i = 0; i < firstDayOfWeek; i++) {
             const d = new Date(year, month, i - firstDayOfWeek + 1);
             const dateStr = `pad-${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-            days.push({ date: dateStr, price: 0, status: "AVAILABLE", floor_price: 0, profitability_percent: 0, isPad: true });
+            days.push({ date: dateStr, price: 0, status: "AVAILABLE", isPad: true });
         }
 
         for (let day = 1; day <= lastDay.getDate(); day++) {
@@ -203,8 +201,6 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
                 date: dateStr,
                 price: 0,
                 status: "AVAILABLE",
-                floor_price: 0,
-                profitability_percent: 100,
             });
         }
 
@@ -292,7 +288,7 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
                             <div className="flex items-center justify-between mb-3">
                                 <h4 className="text-sm font-semibold text-white/80">{t('newRule')}</h4>
                                 <button
-                                    onClick={() => { dispatchSelection({ type: 'RESET_SELECTION' }); setCalendarProfitability(100); }}
+                                    onClick={() => dispatchSelection({ type: 'RESET_SELECTION' })}
                                     className="p-1 hover:bg-white/[0.06] rounded transition-colors text-white/45 hover:text-white/70"
                                 >
                                     <X size={13} />
@@ -319,49 +315,12 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
                                     />
                                 </div>
 
-                                <div>
-                                    <div className="flex items-center justify-between mb-1">
-                                        <label htmlFor="calendar_rule_profitability" className="block text-xs font-medium text-white/50 uppercase tracking-wider">
-                                            {t('profitabilityPercent')}
-                                        </label>
-                                        {(() => {
-                                            const floorPrice = data.calendarData.find(d => d.date === selection.selectionStart)?.floor_price ?? 0;
-                                            const price = floorPrice + (basePrice - floorPrice) * calendarProfitability / 100;
-                                            return (
-                                                <span className="text-xs font-semibold text-brand-primary/80">
-                                                    {t('pricePerNight', { price: formatPrice(price) })}
-                                                </span>
-                                            );
-                                        })()}
-                                    </div>
-                                    <input
-                                        id="calendar_rule_profitability"
-                                        type="number"
-                                        name="profitability_percent"
-                                        value={calendarProfitability}
-                                        onChange={(e) => setCalendarProfitability(parseFloat(e.target.value) || 0)}
-                                        min={0}
-                                        step={0.1}
-                                        required
-                                        className="w-full px-3 py-1.5 text-sm rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-brand-primary/60 focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all mb-2"
-                                    />
-                                    <input
-                                        type="range"
-                                        min={0}
-                                        max={100}
-                                        step={1}
-                                        value={Math.min(Math.max(calendarProfitability, 0), 100)}
-                                        onChange={(e) => setCalendarProfitability(parseFloat(e.target.value))}
-                                        className="w-full h-1.5 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-brand-primary [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-3.5 [&::-moz-range-thumb]:h-3.5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-brand-primary [&::-moz-range-thumb]:border-0"
-                                        style={{
-                                            background: `linear-gradient(to right, #818cf8 0%, #818cf8 ${Math.min(Math.max(calendarProfitability, 0), 100)}%, rgba(255,255,255,0.10) ${Math.min(Math.max(calendarProfitability, 0), 100)}%, rgba(255,255,255,0.10) 100%)`
-                                        }}
-                                    />
-                                    <div className="flex justify-between text-xs text-white/25 mt-0.5">
-                                        <span>0%</span>
-                                        <span>{t('basePriceScale', { price: formatPrice(basePrice) })}</span>
-                                    </div>
-                                </div>
+                                <PricingAdjustmentFields
+                                    idPrefix="calendar_rule"
+                                    basePrice={basePrice}
+                                    inputClassName="w-full px-3 py-1.5 text-sm rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-brand-primary/60 focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all"
+                                    labelClassName="block text-xs font-medium text-white/50 mb-1 uppercase tracking-wider"
+                                />
 
                                 {ruleState.error && (
                                     <p className="text-xs text-brand-danger/90 bg-brand-danger/10 border border-brand-danger/20 rounded px-3 py-1.5">
@@ -372,7 +331,7 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
                                 <div className="flex gap-2 justify-end">
                                     <button
                                         type="button"
-                                        onClick={() => { dispatchSelection({ type: 'RESET_SELECTION' }); setCalendarProfitability(100); }}
+                                        onClick={() => dispatchSelection({ type: 'RESET_SELECTION' })}
                                         className="px-3 py-1.5 text-sm text-white/50 hover:bg-white/[0.05] hover:text-white/75 rounded-lg transition-colors"
                                     >
                                         {t('cancelSelection')}

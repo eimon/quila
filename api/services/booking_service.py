@@ -57,15 +57,12 @@ class BookingService:
 
         # Calculate total amount for this date range
         from services.pricing_service import PricingService
-        total_amount = None
-        try:
-            total_amount = await PricingService(self.db).calculate_booking_total(
-                booking_create.property_id,
-                booking_create.check_in,
-                booking_create.check_out,
-            )
-        except Exception:
-            pass
+        # A failed quote aborts the booking: never store it without a total
+        total_amount = await PricingService(self.db).calculate_booking_total(
+            booking_create.property_id,
+            booking_create.check_in,
+            booking_create.check_out,
+        )
 
         # Create booking
         booking = await self.booking_repo.create(booking_create, ical_uid, total_amount=total_amount)
@@ -120,6 +117,15 @@ class BookingService:
             if conflicts:
                 raise ConflictException(
                     f"Conflicto de fechas con {len(conflicts)} reserva(s) existente(s)"
+                )
+
+            # A real date change re-quotes with the current rules, as creation does.
+            # Resending the same dates keeps the snapshot. Payment fields are never touched.
+            if (check_in, check_out) != (existing.check_in, existing.check_out):
+                from services.pricing_service import PricingService
+                # A failed quote aborts the update: never store a stale or null total
+                existing.total_amount = await PricingService(self.db).calculate_booking_total(
+                    existing.property_id, check_in, check_out
                 )
 
         booking = await self.booking_repo.update(booking_id, booking_update)

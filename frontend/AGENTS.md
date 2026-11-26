@@ -38,7 +38,6 @@ frontend/src/
 │   ├── base_price.ts
 │   ├── bookings.ts
 │   ├── calendar.ts
-│   ├── costs.ts
 │   ├── guests.ts
 │   ├── pricing.ts
 │   ├── properties.ts
@@ -278,39 +277,36 @@ Definidos en `src/types/api.ts`, espejo de los enums del backend:
 | `BookingSource` | `AIRBNB`, `BOOKING`, `DIRECT`, `MANUAL` |
 | `DocumentType` | `DU`, `EXTRANJERO` |
 | `UserRole` | `ADMIN`, `MANAGER`, `OWNER` |
-| `CostCategory` | `RECURRING_MONTHLY`, `PER_DAY_RESERVATION`, `PER_RESERVATION` |
-| `CostCalculationType` | `FIXED_AMOUNT`, `PERCENTAGE` |
+| `PaymentMethod` | `CASH`, `TRANSFER`, `CARD`, `OTHER` |
+| `PricingAdjustmentType` | `PERCENTAGE`, `FIXED_PRICE` |
 
 ## Features Implementadas
 
 ### Dashboard (Home)
 
-- KPIs del mes: total de propiedades, ingresos, ganancia neta y ocupación promedio.
-- Resumen por propiedad: ocupación, ingresos y ganancia del mes actual.
+- KPIs del mes: total de propiedades, ingresos, ingresos pendientes y ocupación promedio.
+- Resumen por propiedad: ocupación, ingresos y pendiente del mes actual.
 - Próximos check-ins: reservas en los próximos 7 días (no canceladas).
 
 ### Gestión de Propiedades
 
 - CRUD completo con validaciones de negocio.
 - Autocompletado de dirección con Nominatim (OpenStreetMap) + miniatura de mapa.
-- Detalle tabulado: **Detalles y Costos** / **Calendario** / **Reportes**.
+- Detalle tabulado: **Detalles** / **Calendario** / **Reportes**.
 
-### Costos y Precios
+### Precios
 
-- Categorías: `RECURRING_MONTHLY`, `PER_DAY_RESERVATION`, `PER_RESERVATION`; tipo `FIXED_AMOUNT` o `PERCENTAGE`.
-- **Versionado temporal** de costos y `base_price`: historial con `start_date`/`end_date`.
-  - `ModifyCostDialog` — modifica valor con fecha de vigencia
+- **Versionado temporal** de `base_price`: historial con `start_date`/`end_date`.
   - `PriceHistoryDialog` — historial de versiones
-  - `FinalizeCostDialog` — cierra la versión activa con `end_date`
   - Revertir al valor anterior
-- `BasePriceCard` — gestión del precio base con el mismo patrón de versionado.
-- Reglas de precio: períodos con rentabilidad % personalizada, visibles en el calendario.
-- `CostsTable`: vista de tabla en desktop, tarjetas en mobile con menú de acciones.
+- `BasePriceCard` — gestión del precio base con versionado.
+- **Reglas de precio**: períodos (`start_date`–`end_date`, ambos inclusive) con un ajuste `PERCENTAGE` (porcentaje sobre el precio base, mayor a -100) o `FIXED_PRICE` (precio por noche fijo, mayor a 0) y una `priority`. Pueden superponerse: gana la de mayor prioridad y, si empatan, la más reciente. Se editan desde la tabla de reglas o creándolas desde una selección de fechas en el calendario (`PricingAdjustmentFields` es el formulario compartido).
+- `PricingRulesTable` muestra período, ajuste (`+30%` o precio fijo) y prioridad.
 
 ### Calendario Interactivo
 
 - Vista mensual con disponibilidad y precios calculados por día.
-- Refleja reglas de precio activas y costos vigentes en cada fecha.
+- Muestra el precio de cada noche y el nombre de la regla ganadora.
 
 ### Reservas y Pagos
 
@@ -328,7 +324,7 @@ Definidos en `src/types/api.ts`, espejo de los enums del backend:
 
 ### Reportes Financieros
 
-- Resumen mensual: ingresos, ocupación, rentabilidad y desglose de costos.
+- Resumen mensual solo de ingresos: total, cobrados (PAID) y pendientes, más ocupación.
 - Navegación por períodos (selector de mes).
 
 ### Usuarios

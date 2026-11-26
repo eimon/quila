@@ -91,13 +91,11 @@ Crear propiedad.
   "address": "string",
   "description": "string (optional)",
   "owner_id": "uuid (optional)",
-  "base_price": 100.00,
-  "avg_stay_days": 3
+  "base_price": 100.00
 }
 ```
 > `manager_id` se asigna automáticamente del usuario autenticado
-> `base_price`: Precio BRUTO por noche (lo que paga el huésped al 100% rentabilidad)
-> `avg_stay_days`: Días promedio de estadía para cálculo de costos
+> `base_price`: Precio BRUTO por noche (lo que paga el huésped cuando no aplica ninguna regla de precio)
 
 **Response:** `201 Created`
 ```json
@@ -109,7 +107,6 @@ Crear propiedad.
   "manager_id": "uuid",
   "owner_id": "uuid",
   "base_price": 100.00,
-  "avg_stay_days": 3,
   "created_at": "datetime",
   "updated_at": "datetime",
   "is_active": true
@@ -180,8 +177,7 @@ Actualizar propiedad.
   "address": "string (optional)",
   "description": "string (optional)",
   "owner_id": "uuid (optional)",
-  "base_price": 100.00,
-  "avg_stay_days": 3
+  "base_price": 100.00
 }
 ```
 
@@ -303,7 +299,8 @@ Crear reserva.
   "source": "AIRBNB" | "BOOKING" | "DIRECT" | "MANUAL" (default: DIRECT)
 }
 ```
-> Valida automáticamente conflictos de fechas
+> Valida automáticamente conflictos de fechas.
+> `total_amount` se cotiza al crear la reserva (mismo cálculo que `price-quote`) y queda como snapshot: cambiar reglas de precio no lo modifica. Solo se recalcula si cambian las fechas de la reserva (`PUT /bookings/{booking_id}`). Si la cotización falla (p. ej. propiedad inexistente), la reserva no se crea.
 
 **Response:** `201 Created`
 ```json
@@ -318,6 +315,8 @@ Crear reserva.
   "description": "string",
   "status": "string",
   "source": "string",
+  "total_amount": "decimal",
+  "paid_amount": "decimal | null",
   "external_id": "string",
   "ical_url": "string",
   "last_synced_at": "datetime",
@@ -366,7 +365,7 @@ Actualizar reserva.
   "status": "CONFIRMED" | "TENTATIVE" | "CANCELLED (optional)"
 }
 ```
-> Valida conflictos si se actualizan fechas
+> Valida conflictos si se actualizan fechas. Si las fechas cambian de verdad, `total_amount` se vuelve a cotizar con las reglas vigentes (mismo cálculo que al crear); si la cotización falla, la actualización falla. Reenviar las mismas fechas o cambiar otros campos no toca el total. En reservas `PAID` se recalcula `total_amount` pero nunca se modifican `paid_amount`, `paid_at` ni `payment_method`.
 
 **Response:** `200 OK` (Objeto reserva actualizado)
 
@@ -416,6 +415,7 @@ Listar reservas de una propiedad específica.
 - `CONFIRMED`: Confirmada
 - `TENTATIVE`: Tentativa
 - `CANCELLED`: Cancelada
+- `PAID`: Pagada
 
 ## Fuentes de Reserva (BookingSource)
 
@@ -431,45 +431,10 @@ Listar reservas de una propiedad específica.
 
 - `OWNER`: Solo visualización de propiedades
 
-## Costos (Costs)
-
-### POST /properties/{id}/costs
-Agregar costo a propiedad.
-**Auth:** Manager/Admin
-
-**Body:**
-```json
-{
-  "name": "Internet",
-  "category": "RECURRING_MONTHLY" | "RECURRING_DAILY" | "PER_RESERVATION",
-  "calculation_type": "FIXED_AMOUNT" | "PERCENTAGE",
-  "value": 50.00
-}
-```
-
-**Categorías de Costo:**
-- `RECURRING_MONTHLY`: Se cobra una vez al mes (Ej: Internet, Expensas)
-- `RECURRING_DAILY`: Se cobra por cada día ocupado (Ej: Electricidad variable)
-- `PER_RESERVATION`: Se cobra por cada reserva (Ej: Limpieza, Check-in)
-
-**Tipos de Cálculo:**
-- `FIXED_AMOUNT`: Monto fijo en pesos
-- `PERCENTAGE`: Porcentaje sobre ingresos (Ej: Comisiones)
-
-### GET /properties/{id}/costs
-Listar costos.
-**Auth:** Authenticated
-
-### PUT /costs/{id}
-Actualizar costo.
-
-### DELETE /costs/{id}
-Eliminar costo (soft delete).
-
 ## Pricing (Precios Dinámicos)
 
 ### POST /properties/{id}/pricing-rules
-Crear una regla de precio (temporada). Valida que no existan colisiones de fechas.
+Crear una regla de precio (temporada). Las reglas pueden superponerse.
 **Auth:** Manager/Admin
 
 **Body:**
@@ -478,29 +443,34 @@ Crear una regla de precio (temporada). Valida que no existan colisiones de fecha
   "name": "Temporada Alta",
   "start_date": "2026-12-20",
   "end_date": "2027-01-05",
-  "profitability_percent": 120.0,
+  "adjustment_type": "PERCENTAGE" | "FIXED_PRICE",
+  "adjustment_value": 30.00,
   "priority": 10
 }
 ```
-> `profitability_percent`: 100 = Base Price / 0 = Floor Price.
+> `start_date` y `end_date` son inclusive; `end_date >= start_date` (una regla puede cubrir un solo día).
+> `adjustment_type = PERCENTAGE`: `adjustment_value` es el porcentaje sobre el precio base y debe ser mayor a -100 (30 = +30 %, -10 = -10 %).
+> `adjustment_type = FIXED_PRICE`: `adjustment_value` es el precio por noche y debe ser mayor a 0.
+> `priority`: entero, default 0.
+> Errores de validación en el alta: `422`.
 
-**Modelo de Precios:**
-- `base_price` (Property): Precio BRUTO que paga el huésped al 100% rentabilidad
-- `Floor Price`: Costos operativos estimados por día [(Fijos/30) + Diarios + (Reserva/AvgStay)]
-- `Profitability 0%`: Precio = Floor (Solo cubre costos)
-- `Profitability 100%`: Precio = Base Price
-- `Profitability 120%`: Precio = Floor + 1.2 × (Base - Floor)
-- **Comisiones**: Se DEDUCEN del precio bruto, no se suman
+**Modelo de Precios (por noche, fecha `d`):**
+- Base: el `PropertyBasePrice` vigente en `d`; si no hay, `Property.base_price`.
+- Regla ganadora: entre las reglas que cubren `d`, la de mayor `priority`; si empatan, la creada más recientemente.
+- `PERCENTAGE` → `base × (1 + valor / 100)`; `FIXED_PRICE` → `valor`; sin regla → base.
+- El total de una estadía suma las noches de `[check_in, check_out)` y se redondea a 2 decimales.
+- Las reservas existentes conservan su `total_amount`: editar o crear reglas no las modifica (incluidas las `PAID`).
 
 ### GET /properties/{id}/pricing-rules
 Listar reglas de precio de una propiedad.
 **Auth:** Authenticated
 
 ### PUT /pricing-rules/{id}
-Actualizar una regla de precio. Valida colisiones excluyendo la regla actual.
+Actualizar una regla de precio. Permite solapamientos.
 **Auth:** Manager/Admin
 
-**Body:** `PricingRuleUpdate` (campos opcionales)
+**Body:** `PricingRuleUpdate` (todos los campos opcionales: `name`, `start_date`, `end_date`, `adjustment_type`, `adjustment_value`, `priority`; `null` = sin cambios)
+> Las fechas y el par tipo/valor se validan sobre la regla resultante: por ejemplo, pasar a `FIXED_PRICE` conservando un valor negativo devuelve `400`.
 
 ### DELETE /pricing-rules/{id}
 Eliminar una regla de precio.
@@ -514,22 +484,20 @@ Obtener calendario con precios calculados día por día.
 - `start_date`: YYYY-MM-DD
 - `end_date`: YYYY-MM-DD
 
-**Response:** Array de objetos diarios
+**Response:** Array de objetos diarios (`start_date` y `end_date` inclusive; `rule_name` es la regla ganadora de ese día)
 ```json
 [
   {
     "date": "2026-01-01",
     "price": 100.00,
     "status": "AVAILABLE" | "RESERVED",
-    "rule_name": "Año Nuevo",
-    "floor_price": 50.00,
-    "profitability_percent": 120.0
+    "rule_name": "Año Nuevo" | null
   }
 ]
 ```
 
 ### GET /properties/{id}/financial-summary
-Obtener resumen financiero mensual con datos reales.
+Obtener resumen mensual de ingresos (sin costos).
 **Auth:** Authenticated
 
 **Query Params:**
@@ -546,14 +514,9 @@ Obtener resumen financiero mensual con datos reales.
   "occupancy_rate": 64.52,
   "total_bookings": 5,
   "total_income": 2000.00,
-  "costs": {
-    "fixed_monthly": 900.00,
-    "fixed_daily": 300.00,
-    "variable_per_reservation": 150.00,
-    "commissions": 200.00,
-    "total": 1550.00
-  },
-  "net_profit": 450.00,
-  "profit_margin_percent": 22.5
+  "paid_income": 1200.00,
+  "pending_income": 800.00
 }
 ```
+> Considera las reservas no canceladas con noches dentro del mes. El ingreso de cada reserva es `paid_amount` si está registrado, si no su `total_amount`, prorrateado por las noches que caen en el mes; las reservas sin total guardado usan los precios por noche vigentes.
+> `paid_income`: reservas `PAID`. `pending_income`: el resto. `total_income = paid_income + pending_income`.

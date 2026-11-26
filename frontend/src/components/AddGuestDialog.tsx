@@ -17,12 +17,13 @@ export default function AddGuestDialog() {
     const tGuest = useTranslations("Guests");
     const tEnums = useTranslations("Enums");
 
-    const [state, formAction, isPending] = useActionState(createGuest, initialState);
-
-    if (state.success && isOpen) {
-        setIsOpen(false);
-        state.success = false;
-    }
+    // Close from the action itself: mutating the returned state during render is not allowed
+    const submit = async (prevState: GuestFormState, formData: FormData): Promise<GuestFormState> => {
+        const result = await createGuest(prevState, formData);
+        if (result.success) setIsOpen(false);
+        return result;
+    };
+    const [state, formAction, isPending] = useActionState(submit, initialState);
 
     return (
         <>

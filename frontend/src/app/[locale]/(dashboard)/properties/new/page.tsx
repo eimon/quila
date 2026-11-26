@@ -93,20 +93,6 @@ export default function NewPropertyPage() {
                                 />
                                 <p className="text-xs text-white/25 mt-1">{t('basePriceHint')}</p>
                             </div>
-
-                            <div>
-                                <label htmlFor="avg_stay_days" className={labelCls}>{t('avgStay')}</label>
-                                <input
-                                    id="avg_stay_days"
-                                    name="avg_stay_days"
-                                    type="number"
-                                    min="1"
-                                    placeholder="3"
-                                    required
-                                    className={inputCls}
-                                />
-                                <p className="text-xs text-white/25 mt-1">{t('avgStayHint')}</p>
-                            </div>
                         </div>
                     </div>
 

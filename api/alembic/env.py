@@ -20,7 +20,7 @@ from models.property import Property  # noqa: F401
 from models.booking import Booking  # noqa: F401
 from models.guest import Guest  # noqa: F401
 from models.pricing_rule import PricingRule  # noqa: F401
-from models.property_cost import PropertyCost  # noqa: F401
+from models.property_base_price import PropertyBasePrice  # noqa: F401
 from models.refresh_token import RefreshToken  # noqa: F401
 
 config = context.config

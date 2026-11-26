@@ -6,8 +6,8 @@ import { User, Property, Booking, FinancialSummary } from "@/types/api";
 import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import {
-    Building2, TrendingUp, Calendar, Wallet,
-    ChevronRight, Plus, ArrowUpRight, ArrowDownRight,
+    Building2, Calendar, Wallet, Clock,
+    ChevronRight, Plus,
     BedDouble, Percent
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
@@ -42,7 +42,7 @@ export default async function DashboardHome() {
     // Aggregate KPIs
     const validSummaries = summaries.filter(Boolean) as FinancialSummary[];
     const totalIncome = validSummaries.reduce((s, r) => s + r.total_income, 0);
-    const totalNetProfit = validSummaries.reduce((s, r) => s + r.net_profit, 0);
+    const totalPending = validSummaries.reduce((s, r) => s + r.pending_income, 0);
     const avgOccupancy = validSummaries.length > 0
         ? validSummaries.reduce((s, r) => s + r.occupancy_rate, 0) / validSummaries.length
         : 0;
@@ -77,11 +77,11 @@ export default async function DashboardHome() {
             bg: "bg-brand-success/10",
         },
         {
-            label: t("netProfit"),
-            value: `$${formatPrice(totalNetProfit)}`,
-            icon: totalNetProfit >= 0 ? TrendingUp : ArrowDownRight,
-            color: totalNetProfit >= 0 ? "text-brand-success" : "text-brand-warning",
-            bg: totalNetProfit >= 0 ? "bg-brand-success/10" : "bg-brand-warning/10",
+            label: t("pendingIncome"),
+            value: `$${formatPrice(totalPending)}`,
+            icon: Clock,
+            color: "text-brand-warning",
+            bg: "bg-brand-warning/10",
         },
         {
             label: t("avgOccupancy"),
@@ -179,9 +179,9 @@ export default async function DashboardHome() {
                                                     <p className="text-sm font-semibold text-brand-success/80">${formatPrice(summary.total_income)}</p>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="text-[10px] text-white/30 uppercase tracking-wider">{t("profit")}</p>
-                                                    <p className={`text-sm font-semibold ${summary.net_profit >= 0 ? "text-brand-success/80" : "text-brand-warning/80"}`}>
-                                                        ${formatPrice(summary.net_profit)}
+                                                    <p className="text-[10px] text-white/30 uppercase tracking-wider">{t("pending")}</p>
+                                                    <p className="text-sm font-semibold text-brand-warning/80">
+                                                        ${formatPrice(summary.pending_income)}
                                                     </p>
                                                 </div>
                                             </div>

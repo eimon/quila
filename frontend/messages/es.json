@@ -62,7 +62,6 @@
         "confirmDelete": "¿Estás seguro de que quieres eliminar esto?",
         "back": "Volver",
         "name": "Nombre",
-        "category": "Categoría",
         "type": "Tipo",
         "value": "Valor",
         "add": "Agregar",
@@ -77,11 +76,9 @@
         "actions": "Acciones",
         "anonymous": "Anónimo",
         "selectProperty": "Seleccionar propiedad...",
-        "noCosts": "No hay costos agregados aún.",
         "dateFrom": "Fecha de inicio",
         "dateTo": "Fecha de fin",
         "endDate": "Hasta",
-        "profitabilityPercent": "Rentabilidad %",
         "optional": "Opcional",
         "confirm": "Confirmar",
         "select": "Seleccionar",
@@ -96,53 +93,36 @@
         "myManaged": "Mis Propiedades Gestionadas",
         "addNew": "Agregar Nueva Propiedad",
         "details": "Detalles de la Propiedad",
-        "costs": "Costos y Tarifas",
         "calendar": "Disponibilidad y Precios",
         "rules": "Reglas de Precios",
         "noProperties": "No se encontraron propiedades",
         "tabs": {
-            "details": "Detalles y Costos",
+            "details": "Detalles",
             "calendar": "Calendario",
             "reports": "Reportes"
         },
-        "modifyCost": "Modificar costo",
         "modifyBasePrice": "Modificar",
         "currentValue": "Valor actual",
         "newValue": "Nuevo valor",
         "applyChange": "Aplicar cambio",
         "modifyDateHint": "El valor anterior seguirá vigente hasta el día anterior a esta fecha.",
         "basePriceLabel": "Precio Base",
-        "basePriceDescription": "Precio bruto por noche utilizado como techo para los cálculos de rentabilidad.",
-        "revertCost": "Revertir al valor anterior",
+        "basePriceDescription": "Precio bruto por noche. Las reglas de precios lo ajustan con un porcentaje o lo reemplazan por un precio fijo.",
         "revertBasePrice": "Revertir",
         "confirmRevert": "Se deshará el último cambio y se restaurará el valor anterior. ¿Continuar?",
-        "finalizeCost": "Establecer fecha de finalización",
-        "finalizeHint": "Seleccioná el último día en que se cobrará este costo. A partir de esa fecha dejará de estar vigente.",
-        "finalizeEndDate": "Último día de cobro",
-        "finalizeConfirm": "Finalizar",
-        "finalized": "Finalizado",
-        "upcoming": "Próximo",
-        "showAllCosts": "Mostrar todos los costos",
-        "costsDescription": "Gestionar costos recurrentes y fijos para esta propiedad.",
         "calendarDescription": "Ver reservas y precios diarios en el calendario",
         "rulesDescription": "Gestionar períodos de precios estacionales y especiales",
         "noRules": "No hay reglas de precios agregadas aún.",
         "rulePeriod": "Período",
-        "ruleProfitability": "Rentabilidad",
-        "estimatedPrice": "≈ {price} / noche",
-        "pricingFloorLabel": "0% (piso)",
-        "pricingBaseLabel": "100% (base: {price})",
         "create": {
             "title": "Agregar Nueva Propiedad",
             "name": "Nombre de la Propiedad",
             "address": "Dirección",
             "description": "Descripción",
             "basePrice": "Precio Base",
-            "avgStay": "Estadía Promedio (días)",
             "submit": "Crear Propiedad",
             "subtitle": "Ingresá los detalles de la propiedad que querés gestionar.",
-            "basePriceHint": "Precio bruto que pagan los huéspedes al 100% de rentabilidad",
-            "avgStayHint": "Para cálculos de costos"
+            "basePriceHint": "Precio bruto por noche que pagan los huéspedes cuando no aplica ninguna regla"
         }
     },
     "Calendar": {
@@ -155,11 +135,7 @@
         "selectedRange": "{start} → {end}",
         "ruleName": "Nombre de la regla",
         "ruleNamePlaceholder": "Ej: Temporada alta",
-        "profitabilityPercent": "Rentabilidad %",
-        "profitabilityHint": "100 = precio base, 120 = +20%",
-        "saveRule": "Guardar regla",
-        "pricePerNight": "{price} / noche",
-        "basePriceScale": "100% = {price}"
+        "saveRule": "Guardar regla"
     },
     "Auth": {
         "loginTitle": "Bienvenido de nuevo",
@@ -177,7 +153,6 @@
         "subtitle": "Resumen del mes de {month}",
         "totalProperties": "Propiedades",
         "monthlyIncome": "Ingresos del mes",
-        "netProfit": "Ganancia neta",
         "avgOccupancy": "Ocupación promedio",
         "propertySummary": "Tus propiedades",
         "noProperties": "Aún no tenés propiedades administradas.",
@@ -188,26 +163,23 @@
         "nights": "noches",
         "occupancy": "Ocupación",
         "income": "Ingresos",
-        "profit": "Ganancia",
-        "checkIn": "Check-in"
+        "checkIn": "Check-in",
+        "pendingIncome": "Ingresos pendientes",
+        "pending": "Pendiente"
     },
     "Reports": {
         "title": "Reporte Financiero",
         "noData": "No hay datos financieros disponibles para este período.",
         "summary": "Resumen",
         "income": "Ingresos Totales",
-        "costs": "Costos Totales",
-        "margin": "Margen de Ganancia",
         "occupancy": "Tasa de Ocupación",
         "occupiedDays": "Días Ocupados",
         "totalBookings": "Reservas Totales",
-        "netProfit": "Ganancia Neta",
-        "fixedMonthly": "Costos Fijos Mensuales",
-        "fixedDaily": "Por Día (Reserva)",
-        "variableCosts": "Costos Variables (Reserva)",
-        "commissions": "Comisiones",
-        "breakdown": "Desglose de Costos",
-        "details": "Visualiza el resumen del rendimiento financiero de tu propiedad."
+        "details": "Visualiza el resumen del rendimiento financiero de tu propiedad.",
+        "paidIncome": "Ingresos Cobrados",
+        "paidIncomeDetail": "Reservas marcadas como pagadas",
+        "pendingIncome": "Ingresos Pendientes",
+        "pendingIncomeDetail": "Reservas confirmadas o tentativas sin pagar"
     },
     "Profile": {
         "title": "Mi Perfil",
@@ -241,15 +213,6 @@
         "passwordHint": "Dejar vacío para no cambiar la contraseña"
     },
     "Enums": {
-        "CostCategory": {
-            "RECURRING_MONTHLY": "Recurrente Mensual",
-            "PER_DAY_RESERVATION": "Por Día (Reserva)",
-            "PER_RESERVATION": "Por Reserva"
-        },
-        "CostCalculationType": {
-            "FIXED_AMOUNT": "Monto Fijo",
-            "PERCENTAGE": "Porcentaje"
-        },
         "BookingStatus": {
             "CONFIRMED": "Confirmado",
             "TENTATIVE": "Tentativo",
@@ -276,6 +239,22 @@
             "admin": "Administrador",
             "manager": "Gestor",
             "owner": "Propietario"
+        },
+        "PricingAdjustmentType": {
+            "PERCENTAGE": "Porcentaje",
+            "FIXED_PRICE": "Precio fijo"
         }
+    },
+    "PricingRules": {
+        "adjustment": "Ajuste",
+        "adjustmentType": "Tipo de ajuste",
+        "priority": "Prioridad",
+        "priorityHint": "Si las reglas se superponen, gana la de mayor prioridad; si empatan, la más reciente.",
+        "percentageValue": "Ajuste %",
+        "fixedPriceValue": "Precio por noche",
+        "percentageHint": "Sobre el precio base ({price}): 30 = +30%, -10 = -10%",
+        "fixedPriceHint": "Reemplaza el precio base en todas las noches del período",
+        "estimatedPrice": "≈ {price} / noche",
+        "fixedPriceDisplay": "{price} fijo"
     }
 }

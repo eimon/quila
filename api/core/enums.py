@@ -33,12 +33,7 @@ class DocumentType(str, enum.Enum):
     EXTRANJERO = "EXTRANJERO"  # Documento extranjero (alfanumérico)
 
 
-class CostCategory(str, enum.Enum):
-    RECURRING_MONTHLY = "RECURRING_MONTHLY"      # Applies once per month
-    PER_DAY_RESERVATION = "PER_DAY_RESERVATION"  # Applies per day of each reservation (e.g. breakfast)
-    PER_RESERVATION = "PER_RESERVATION"          # Applies once per reservation (e.g. cleaning)
 
-
-class CostCalculationType(str, enum.Enum):
-    FIXED_AMOUNT = "FIXED_AMOUNT"  # Exact amount
-    PERCENTAGE = "PERCENTAGE"      # Percentage of total
+class PricingAdjustmentType(str, enum.Enum):
+    PERCENTAGE = "PERCENTAGE"    # base_price * (1 + value / 100)
+    FIXED_PRICE = "FIXED_PRICE"  # value replaces the nightly price

@@ -104,17 +104,6 @@ export default function EditPropertyDialog({ property, onClose }: EditPropertyDi
                                     className={inputCls}
                                 />
                             </div>
-                            <div>
-                                <label className={labelCls}>{t('avgStay')}</label>
-                                <input
-                                    name="avg_stay_days"
-                                    type="number"
-                                    min="1"
-                                    required
-                                    defaultValue={property.avg_stay_days}
-                                    className={inputCls}
-                                />
-                            </div>
                         </div>
                     </div>
 

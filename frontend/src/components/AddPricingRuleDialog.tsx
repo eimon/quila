@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { createPricingRule, PricingRuleFormState } from "@/actions/pricing";
 import { Plus, X, Loader2 } from "lucide-react";
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
-import { formatPrice } from "@/lib/utils";
+import PricingAdjustmentFields from "./PricingAdjustmentFields";
 
 interface AddPricingRuleDialogProps {
     propertyId: string;
@@ -17,23 +17,17 @@ const labelCls = "block text-xs font-medium text-white/55 mb-1.5 uppercase track
 
 export default function AddPricingRuleDialog({ propertyId, basePrice }: AddPricingRuleDialogProps) {
     const [isOpen, setIsOpen] = useState(false);
-    const [profitability, setProfitability] = useState(100);
     const initialState: PricingRuleFormState = { error: "", success: false };
     const t = useTranslations("Common");
     const tProp = useTranslations("Properties");
 
-    const createRuleWithId = createPricingRule.bind(null, propertyId);
-    const [state, formAction, isPending] = useActionState(createRuleWithId, initialState);
-
-    useEffect(() => {
-        if (state.success && isOpen) {
-            setIsOpen(false);
-            setProfitability(100);
-        }
-    }, [state.success, isOpen]);
-
-    const sliderValue = Math.min(Math.max(profitability, 0), 100);
-    const estimatedPrice = formatPrice(basePrice * profitability / 100);
+    // Close from the action itself instead of syncing state in an effect
+    const submit = async (prevState: PricingRuleFormState, formData: FormData): Promise<PricingRuleFormState> => {
+        const result = await createPricingRule(propertyId, prevState, formData);
+        if (result.success) setIsOpen(false);
+        return result;
+    };
+    const [state, formAction, isPending] = useActionState(submit, initialState);
 
     return (
         <>
@@ -51,7 +45,7 @@ export default function AddPricingRuleDialog({ propertyId, basePrice }: AddPrici
                         <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.08]">
                             <h3 className="text-base font-semibold text-white/90">{t('add')} {tProp('rules')}</h3>
                             <button
-                                onClick={() => { setIsOpen(false); setProfitability(100); }}
+                                onClick={() => setIsOpen(false)}
                                 className="text-white/40 hover:text-white/70 transition-colors"
                             >
                                 <X size={18} />
@@ -102,48 +96,17 @@ export default function AddPricingRuleDialog({ propertyId, basePrice }: AddPrici
                                 </div>
                             </div>
 
-                            <div>
-                                <div className="flex items-center justify-between mb-1.5">
-                                    <label htmlFor="add_rule_profitability_percent" className={labelCls}>
-                                        {t('profitabilityPercent')}
-                                    </label>
-                                    <span className="text-xs font-semibold text-brand-primary/80">
-                                        {tProp('estimatedPrice', { price: estimatedPrice })}
-                                    </span>
-                                </div>
-                                <input
-                                    id="add_rule_profitability_percent"
-                                    name="profitability_percent"
-                                    type="number"
-                                    step="0.1"
-                                    min="0"
-                                    required
-                                    value={profitability}
-                                    onChange={(e) => setProfitability(parseFloat(e.target.value) || 0)}
-                                    className={`${inputCls} mb-3`}
-                                />
-                                <input
-                                    type="range"
-                                    min={0}
-                                    max={100}
-                                    step={1}
-                                    value={sliderValue}
-                                    onChange={(e) => setProfitability(parseFloat(e.target.value))}
-                                    className="w-full h-2 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-brand-primary [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-brand-primary [&::-moz-range-thumb]:border-0"
-                                    style={{
-                                        background: `linear-gradient(to right, #818cf8 0%, #818cf8 ${sliderValue}%, rgba(255,255,255,0.10) ${sliderValue}%, rgba(255,255,255,0.10) 100%)`
-                                    }}
-                                />
-                                <div className="flex justify-between text-xs text-white/25 mt-1">
-                                    <span>{tProp('pricingFloorLabel')}</span>
-                                    <span>{tProp('pricingBaseLabel', { price: formatPrice(basePrice) })}</span>
-                                </div>
-                            </div>
+                            <PricingAdjustmentFields
+                                idPrefix="add_rule"
+                                basePrice={basePrice}
+                                inputClassName={inputCls}
+                                labelClassName={labelCls}
+                            />
 
                             <div className="pt-2 flex justify-end space-x-3">
                                 <button
                                     type="button"
-                                    onClick={() => { setIsOpen(false); setProfitability(100); }}
+                                    onClick={() => setIsOpen(false)}
                                     className="px-4 py-2 text-sm font-medium text-white/55 hover:bg-white/[0.05] hover:text-white/75 rounded-lg transition-colors"
                                 >
                                     {t('cancel')}

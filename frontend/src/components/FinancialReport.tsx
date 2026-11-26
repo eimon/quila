@@ -4,16 +4,13 @@ import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import {
     TrendingUp,
-    DollarSign,
-    Percent,
+    Wallet,
+    Clock,
     Calendar,
     ChevronLeft,
     ChevronRight,
     Loader2,
     PieChart,
-    ArrowUpRight,
-    ArrowDownRight,
-    Briefcase
 } from "lucide-react";
 import { getFinancialSummary } from "@/actions/reports";
 import { FinancialSummary } from "@/types/api";
@@ -25,27 +22,29 @@ interface FinancialReportProps {
 
 export default function FinancialReport({ propertyId }: FinancialReportProps) {
     const [currentDate, setCurrentDate] = useState(new Date());
-    const [summary, setSummary] = useState<FinancialSummary | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    // Keyed by request so loading is derived instead of set synchronously in the effect
+    const [loaded, setLoaded] = useState<{ key: string; summary: FinancialSummary | null } | null>(null);
 
     const t = useTranslations("Reports");
     const tCommon = useTranslations("Common");
     const locale = useLocale();
 
-    useEffect(() => {
-        fetchData();
-    }, [currentDate, propertyId]);
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth() + 1;
+    const requestKey = `${propertyId}:${year}-${month}`;
 
-    const fetchData = async () => {
-        setIsLoading(true);
-        const data = await getFinancialSummary(
-            propertyId,
-            currentDate.getFullYear(),
-            currentDate.getMonth() + 1
-        );
-        setSummary(data);
-        setIsLoading(false);
-    };
+    useEffect(() => {
+        let cancelled = false;
+        getFinancialSummary(propertyId, year, month).then((data) => {
+            if (!cancelled) setLoaded({ key: requestKey, summary: data });
+        });
+        return () => {
+            cancelled = true;
+        };
+    }, [propertyId, year, month, requestKey]);
+
+    const isLoading = loaded?.key !== requestKey;
+    const summary = loaded && !isLoading ? loaded.summary : null;
 
     const prevMonth = () => {
         setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
@@ -69,20 +68,20 @@ export default function FinancialReport({ propertyId }: FinancialReportProps) {
             detail: `${summary.total_bookings} ${t("totalBookings")}`
         },
         {
-            title: t("costs"),
-            value: `$${formatPrice(summary.costs.total)}`,
-            icon: DollarSign,
-            color: "text-brand-danger",
-            bg: "bg-brand-danger/10",
-            detail: t("breakdown")
+            title: t("paidIncome"),
+            value: `$${formatPrice(summary.paid_income)}`,
+            icon: Wallet,
+            color: "text-brand-success",
+            bg: "bg-brand-success/10",
+            detail: t("paidIncomeDetail")
         },
         {
-            title: t("netProfit"),
-            value: `$${formatPrice(summary.net_profit)}`,
-            icon: Briefcase,
-            color: summary.net_profit >= 0 ? "text-brand-success" : "text-brand-warning",
-            bg: summary.net_profit >= 0 ? "bg-brand-success/10" : "bg-brand-warning/10",
-            detail: `${summary.profit_margin_percent}% ${t("margin")}`
+            title: t("pendingIncome"),
+            value: `$${formatPrice(summary.pending_income)}`,
+            icon: Clock,
+            color: "text-brand-warning",
+            bg: "bg-brand-warning/10",
+            detail: t("pendingIncomeDetail")
         },
         {
             title: t("occupancy"),
@@ -148,68 +147,6 @@ export default function FinancialReport({ propertyId }: FinancialReportProps) {
                                 </div>
                             </div>
                         ))}
-                    </div>
-
-                    {/* Detailed Breakdown */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {/* Cost Breakdown Table */}
-                        <div className="lg:col-span-2 glass rounded-2xl overflow-hidden">
-                            <div className="px-6 py-5 border-b border-white/[0.07] flex items-center gap-3">
-                                <div className="p-2 bg-brand-danger/10 rounded-lg">
-                                    <PieChart className="text-brand-danger" size={18} />
-                                </div>
-                                <h3 className="font-bold text-white/80">{t("breakdown")}</h3>
-                            </div>
-                            <div className="divide-y divide-white/[0.05]">
-                                <div className="flex items-center justify-between px-6 py-4 hover:bg-white/[0.03] transition-colors">
-                                    <span className="text-sm text-white/55">{t("fixedMonthly")}</span>
-                                    <span className="font-semibold text-white/80">${formatPrice(summary.costs.fixed_monthly)}</span>
-                                </div>
-                                <div className="flex items-center justify-between px-6 py-4 hover:bg-white/[0.03] transition-colors">
-                                    <span className="text-sm text-white/55">{t("fixedDaily")}</span>
-                                    <span className="font-semibold text-white/80">${formatPrice(summary.costs.fixed_daily)}</span>
-                                </div>
-                                <div className="flex items-center justify-between px-6 py-4 hover:bg-white/[0.03] transition-colors">
-                                    <span className="text-sm text-white/55">{t("variableCosts")}</span>
-                                    <span className="font-semibold text-white/80">${formatPrice(summary.costs.variable_per_reservation)}</span>
-                                </div>
-                                <div className="flex items-center justify-between px-6 py-4 hover:bg-white/[0.03] transition-colors">
-                                    <span className="text-sm text-brand-warning/80">{t("commissions")} (OTA)</span>
-                                    <span className="font-semibold text-brand-warning/80">-${formatPrice(summary.costs.commissions)}</span>
-                                </div>
-                                <div className="flex items-center justify-between px-6 py-5 bg-white/[0.03]">
-                                    <span className="font-bold text-white/80">{tCommon("value")} {t("costs")}</span>
-                                    <span className="text-lg font-black text-brand-danger">${formatPrice(summary.costs.total)}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Net Profit Summary Card */}
-                        <div className="bg-gradient-to-br from-brand-primary/70 to-violet-600/70 rounded-2xl p-8 text-white shadow-[0_16px_48px_rgba(99,102,241,0.20)] relative overflow-hidden flex flex-col justify-between border border-white/10">
-                            <div className="absolute top-0 right-0 p-4 opacity-10">
-                                <TrendingUp size={110} />
-                            </div>
-
-                            <div className="relative z-10">
-                                <p className="text-white/70 font-medium mb-1 text-sm">{t("netProfit")}</p>
-                                <h4 className="text-4xl font-extrabold">${formatPrice(summary.net_profit)}</h4>
-                                <div className="mt-4 flex items-center gap-2 text-sm bg-white/10 w-fit px-3 py-1 rounded-full backdrop-blur-md">
-                                    <ArrowUpRight size={15} />
-                                    <span>{summary.profit_margin_percent}% {t("margin")}</span>
-                                </div>
-                            </div>
-
-                            <div className="relative z-10 mt-12 grid grid-cols-2 gap-4">
-                                <div className="space-y-1">
-                                    <p className="text-white/55 text-xs font-medium uppercase tracking-wider">{t("occupiedDays")}</p>
-                                    <p className="text-xl font-bold">{summary.occupied_days}</p>
-                                </div>
-                                <div className="space-y-1">
-                                    <p className="text-white/55 text-xs font-medium uppercase tracking-wider">{t("totalBookings")}</p>
-                                    <p className="text-xl font-bold">{summary.total_bookings}</p>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             ) : (
