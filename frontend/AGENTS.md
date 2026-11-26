@@ -274,7 +274,7 @@ Definidos en `src/types/api.ts`, espejo de los enums del backend:
 | Enum | Valores |
 |---|---|
 | `BookingStatus` | `CONFIRMED`, `TENTATIVE`, `CANCELLED`, `PAID` |
-| `BookingSource` | `AIRBNB`, `BOOKING`, `DIRECT`, `MANUAL` |
+| `BookingSource` | `AIRBNB`, `BOOKING`, `DIRECT`, `MANUAL`, `CHATBOT` |
 | `DocumentType` | `DU`, `EXTRANJERO` |
 | `UserRole` | `ADMIN`, `MANAGER`, `OWNER` |
 | `PaymentMethod` | `CASH`, `TRANSFER`, `CARD`, `OTHER` |
@@ -293,6 +293,7 @@ Definidos en `src/types/api.ts`, espejo de los enums del backend:
 - CRUD completo con validaciones de negocio.
 - Autocompletado de dirección con Nominatim (OpenStreetMap) + miniatura de mapa.
 - Detalle tabulado: **Detalles** / **Calendario** / **Reportes**.
+- Campos de catálogo (capacidad, comodidades, horarios de check-in/out, política de cancelación, reglas de la casa) en crear/editar vía `PropertyCatalogFields`; se publican en `GET /public/catalog` para el chatbot. Campos vacíos se envían como `null`.
 
 ### Precios
 
@@ -316,6 +317,7 @@ Definidos en `src/types/api.ts`, espejo de los enums del backend:
 - `AddBookingDialog`: estimación de precio antes de confirmar (consulta al backend).
 - `PayBookingDialog`: registro de pago, historial de pagos y reversión del último pago.
 - `BookingsTable`: vista adaptada a mobile con menú de acciones.
+- **Holds del chatbot** (`source=CHATBOT`, sin huésped): la tabla muestra el lead en lugar del huésped y `HoldExpiry` muestra "Vence ..." mientras el hold está vigente o "Vencido" cuando `expires_at` pasó (`holdExpiryState` en `src/lib/utils.ts`). `BookingDetailModal` muestra huéspedes, vencimiento y los datos de contacto del lead. Aceptar el hold lo confirma y borra el vencimiento.
 
 ### Huéspedes
 

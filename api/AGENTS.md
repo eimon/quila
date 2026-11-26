@@ -232,7 +232,8 @@ app.include_router(nuevo_router.router)
 |------|---------|
 | `UserRole` | `admin`, `manager`, `owner` |
 | `BookingStatus` | `CONFIRMED`, `TENTATIVE`, `CANCELLED`, `PAID` |
-| `BookingSource` | `AIRBNB`, `BOOKING`, `DIRECT`, `MANUAL` |
+| `BookingSource` | `AIRBNB`, `BOOKING`, `DIRECT`, `MANUAL`, `CHATBOT` |
+| `BotFailureReason` | `unavailable`, `over_capacity`, `invalid_dates`, `property_not_found`, `capacity_unknown` |
 | `DocumentType` | `DU`, `EXTRANJERO` |
 | `PaymentMethod` | `CASH`, `TRANSFER`, `CARD`, `OTHER` |
 | `PricingAdjustmentType` | `PERCENTAGE`, `FIXED_PRICE` |
@@ -245,6 +246,17 @@ app.include_router(nuevo_router.router)
 - Reglas y precios base se traen una sola vez por rango (`PricingRuleRepository.get_overlapping`, ya ordenado por precedencia) y se resuelven en memoria: nada de una query por noche. Lo usan la cotización, el calendario y el resumen financiero.
 - `Booking.total_amount` es un snapshot tomado al crear la reserva; si la cotización falla, la creación falla. Cambiar reglas no modifica reservas existentes (tampoco las PAID).
 - El resumen financiero es solo de ingresos (`total_income`, `paid_income`, `pending_income`, ocupación).
+
+## Integración chatbot (routers/bot.py, routers/public.py)
+
+- `GET /public/catalog` (sin auth): markdown de propiedades activas armado por `services/catalog_service.py`. Solo datos para huéspedes: nunca ids de managers/owners, emails, reservas ni huéspedes.
+- `/bot/*` es un router aparte de los de JWT de usuario: `dependencies=[Depends(require_bot_key)]` (`dependencies/bot_auth.py`). Espera `Authorization: Bearer <BOT_API_KEY>` y compara con `hmac.compare_digest`. Sin header o clave incorrecta → 401; `BOT_API_KEY` vacía → 503 `bot integration disabled`.
+- **Resultados de negocio siempre HTTP 200.** `BotService` (`services/bot_service.py`) **devuelve** `BotFailure` (`{"ok": false, "reason", "message"}`) en lugar de lanzar excepciones; los mensajes en español viven en `services/bot_outcomes.py`. 422 solo para bodies mal formados. Los response models son `Union[Exito, BotFailure]`.
+- Fechas: `check_in >= hoy` (fecha del servidor), `check_out > check_in`, `check_out` exclusivo.
+- Disponibilidad: `PropertyRepository.get_available` (una sola query con `NOT EXISTS` sobre reservas no canceladas) + `PricingService.quote_property` por candidata (precios por rango, sin N+1). `max_guests` nulo → excluida.
+- **Holds:** reserva `TENTATIVE`, `source=CHATBOT`, `guest_id` nulo, datos del lead y `expires_at = now(UTC) + HOLD_TTL_HOURS`. El insert corre en un SAVEPOINT (`db.begin_nested()`): si el `EXCLUDE` lo rechaza, se devuelve `unavailable` y la transacción del request sigue usable.
+- **Expiración lazy:** `BookingRepository.expire_stale_holds()` pasa a `CANCELLED` los `TENTATIVE` con `expires_at` vencido (nunca toca reservas sin `expires_at`). Se llama al inicio de availability/quote/hold del bot, crear/editar/aceptar reservas y el calendario, en la misma transacción. Aceptar, pagar o pasar a `CONFIRMED`/`PAID` borra `expires_at`; cancelar lo conserva.
+- Tests: fixtures `bot_key` / `bot_headers` en `tests/conftest.py`; helpers en `tests/bot_helpers.py`. La DB de test recrea el constraint `excl_bookings_no_overlap` tras `create_all`.
 
 ## Permisos (core/roles.py)
 
