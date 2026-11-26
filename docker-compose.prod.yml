@@ -8,6 +8,7 @@ services:
       DATABASE_URL: postgresql+asyncpg://postgres:${POSTGRES_PASSWORD:-password}@quila_db:5432/quila_db
       BOT_API_KEY: ${BOT_API_KEY:-}
       HOLD_TTL_HOURS: ${HOLD_TTL_HOURS:-24}
+      BUSINESS_TIMEZONE: ${BUSINESS_TIMEZONE:-America/Argentina/Buenos_Aires}
       VIRTUAL_HOST: ${API_HOST:-localhost}
       VIRTUAL_PORT: 8000
       LETSENCRYPT_HOST: ${API_HOST:-localhost}
