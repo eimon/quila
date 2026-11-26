@@ -1,10 +1,12 @@
 """Shared helpers for the /bot test modules."""
-from datetime import date, timedelta
+from datetime import timedelta
+
+from core.time import business_today
 
 
 def day(offset: int) -> str:
-    """ISO date `offset` days from the server's today."""
-    return (date.today() + timedelta(days=offset)).isoformat()
+    """ISO date `offset` days from the business today (BUSINESS_TIMEZONE)."""
+    return (business_today() + timedelta(days=offset)).isoformat()
 
 
 async def create_cabin(client, headers, name, max_guests=4, base_price="100.00", **extra):

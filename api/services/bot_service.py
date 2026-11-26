@@ -1,5 +1,5 @@
 import uuid
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, timedelta
 from decimal import Decimal
 from typing import Optional
 
@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.config import settings
+from core.time import business_today, utc_now
 from core.enums import BookingSource, BookingStatus, BotFailureReason
 from models.property import Property
 from repositories.booking_repository import BookingRepository
@@ -65,27 +66,29 @@ class BotService:
     async def search_availability(
         self, req: BotAvailabilityRequest, today: Optional[date] = None
     ) -> BotAvailabilityResponse | BotFailure:
-        failure = self._validate_dates(req, today or date.today())
+        failure = self._validate_dates(req, today or business_today())
         if failure:
             return failure
 
         await self.booking_repo.expire_stale_holds()
         nights = (req.check_out - req.check_in).days
         candidates = await self.property_repo.get_available(req.check_in, req.check_out, req.guests)
-        options = []
-        for prop in candidates:
-            total = await self.pricing.quote_property(prop, req.check_in, req.check_out)
-            options.append(BotAvailabilityOption(
+        # One batch for all candidates: a constant number of queries, whatever their count
+        totals = await self.pricing.quote_properties(candidates, req.check_in, req.check_out)
+        options = [
+            BotAvailabilityOption(
                 property_id=prop.id,
                 name=prop.name,
                 max_guests=prop.max_guests,
-                total_amount=total,
-                nightly_average=round(total / Decimal(nights), 2),
-            ))
+                total_amount=totals[prop.id],
+                nightly_average=round(totals[prop.id] / Decimal(nights), 2),
+            )
+            for prop in candidates
+        ]
         return BotAvailabilityResponse(nights=nights, options=options)
 
     async def quote(self, req: BotQuoteRequest, today: Optional[date] = None) -> BotQuoteResponse | BotFailure:
-        failure = self._validate_dates(req, today or date.today())
+        failure = self._validate_dates(req, today or business_today())
         if failure:
             return failure
         await self.booking_repo.expire_stale_holds()
@@ -105,7 +108,7 @@ class BotService:
 
     async def create_hold(self, req: BotHoldRequest, today: Optional[date] = None) -> BotHoldResponse | BotFailure:
         """Pre-reserve a cabin: a TENTATIVE CHATBOT booking that expires after HOLD_TTL_HOURS."""
-        failure = self._validate_dates(req, today or date.today())
+        failure = self._validate_dates(req, today or business_today())
         if failure:
             return failure
         await self.booking_repo.expire_stale_holds()
@@ -118,7 +121,7 @@ class BotService:
             return unavailable
 
         total = await self.pricing.quote_property(prop, req.check_in, req.check_out)
-        expires_at = datetime.now(timezone.utc) + timedelta(hours=settings.HOLD_TTL_HOURS)
+        expires_at = utc_now() + timedelta(hours=settings.HOLD_TTL_HOURS)
         booking_in = BookingCreate(
             property_id=prop.id,
             guest_id=None,

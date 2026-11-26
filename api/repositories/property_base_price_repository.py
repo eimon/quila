@@ -120,6 +120,25 @@ class PropertyBasePriceRepository:
         )
         return list(result.scalars().all())
 
+    async def get_overlapping_for_properties(
+        self, property_ids: list[uuid.UUID], range_start: date, range_end: date
+    ) -> dict[uuid.UUID, list[PropertyBasePrice]]:
+        """`get_overlapping` for many properties in one query: {property_id: records}."""
+        if not property_ids:
+            return {}
+        result = await self.db.execute(
+            select(PropertyBasePrice).where(
+                PropertyBasePrice.property_id.in_(property_ids),
+                PropertyBasePrice.is_active == True,
+                or_(PropertyBasePrice.start_date == None, PropertyBasePrice.start_date <= range_end),
+                or_(PropertyBasePrice.end_date == None, PropertyBasePrice.end_date >= range_start),
+            )
+        )
+        by_property: dict[uuid.UUID, list[PropertyBasePrice]] = {pid: [] for pid in property_ids}
+        for record in result.scalars().all():
+            by_property[record.property_id].append(record)
+        return by_property
+
     # ------------------------------------------------------------------ #
     # Versioning operations                                                #
     # ------------------------------------------------------------------ #

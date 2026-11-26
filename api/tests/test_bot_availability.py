@@ -118,9 +118,11 @@ async def test_availability_today_is_valid(client, bot_headers, admin_headers):
     {"check_in": "2030-01-01", "check_out": "2030-01-03", "guests": 0},
     {"check_in": "01/01/2030", "check_out": "2030-01-03", "guests": 2},
 ])
-async def test_availability_malformed_body_is_422(client, bot_headers, body):
+async def test_availability_malformed_body_is_invalid_input(client, bot_headers, body):
     resp = await client.post(AVAILABILITY_URL, json=body, headers=bot_headers)
-    assert resp.status_code == 422
+    assert resp.status_code == 200
+    assert resp.json()["ok"] is False
+    assert resp.json()["reason"] == "invalid_input"
 
 
 # ---------- Quote ----------

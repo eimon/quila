@@ -26,7 +26,7 @@ docker exec quila_api alembic revision --autogenerate -m "description"
 
 Database migrations run automatically on container start via `entrypoint.sh` → `alembic upgrade head`.
 
-**Required environment variables:** `SECRET_KEY`, `DATABASE_URL` (set in docker-compose), optional `ALGORITHM` (default HS256), `DOMAIN` (default example.com), `BOT_API_KEY` (default empty = `/bot/*` disabled), `HOLD_TTL_HOURS` (default 24).
+**Required environment variables:** `SECRET_KEY`, `DATABASE_URL` (set in docker-compose), optional `ALGORITHM` (default HS256), `DOMAIN` (default example.com), `BOT_API_KEY` (default empty = `/bot/*` disabled), `HOLD_TTL_HOURS` (default 24), `BUSINESS_TIMEZONE` (default `America/Argentina/Buenos_Aires`; IANA zone that defines the business "today").
 
 ## Architecture
 
@@ -57,7 +57,7 @@ api/
 - **Booking totals are snapshots:** `Booking.total_amount` is quoted at creation (creation fails if the quote fails) and never changes when rules change, so rules can be edited over any booking, PAID included.
 - **Bookings** use iCal UIDs, date-only fields (no time component), and validate against date conflicts. Sources: AIRBNB, BOOKING, DIRECT, MANUAL, CHATBOT.
 - **Property catalog:** optional `max_guests`, `amenities`, `check_in_time`/`check_out_time`, `cancellation_policy`, `house_rules`, published as markdown by the public `GET /public/catalog` (chatbot RAG source).
-- **Chatbot contract (`/bot/*`):** machine-to-machine auth with `Authorization: Bearer <BOT_API_KEY>`; `POST /bot/availability`, `/bot/quote`, `/bot/holds`. Business outcomes are always HTTP 200 (`ok: true`, or `ok: false` with `reason` + Spanish `message`). A hold is a TENTATIVE CHATBOT booking with lead data and `expires_at`; expired holds are cancelled lazily (no scheduler) before availability, quotes, holds, booking create/update/accept and the calendar. A human converts the hold by accepting it in the panel, which clears `expires_at`. Tool definitions to register in chatv2 live in `api/API_ENDPOINTS.md`.
+- **Chatbot contract (`/bot/*`):** machine-to-machine auth with `Authorization: Bearer <BOT_API_KEY>`; `POST /bot/availability`, `/bot/quote`, `/bot/holds`. Business outcomes are always HTTP 200 (`ok: true`, or `ok: false` with `reason` + Spanish `message`), including malformed bodies (`invalid_input`, only for callers with a valid key; other routers keep 422). "Today" is the business date in `BUSINESS_TIMEZONE` (`core/time.py: business_today()`). A hold is a TENTATIVE CHATBOT booking with lead data and `expires_at`; expired holds are cancelled lazily (no scheduler) before availability, quotes, holds, booking create/update/accept and the calendar. A human converts the hold by accepting it in the panel, which clears `expires_at`. Tool definitions to register in chatv2 live in `api/API_ENDPOINTS.md`.
 - **Financial summary** is revenue-only: monthly total / paid / pending income (booking amounts prorated by nights in the month) and occupancy. There is no costs module.
 
 ## Conventions

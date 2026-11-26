@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     BOT_API_KEY: str = ""
     # Lifetime of a chatbot hold (TENTATIVE booking) before it expires lazily
     HOLD_TTL_HOURS: int = 24
+    # IANA timezone that defines the business "today" (check-in dates, current prices)
+    BUSINESS_TIMEZONE: str = "America/Argentina/Buenos_Aires"
 
     class Config:
         case_sensitive = True

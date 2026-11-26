@@ -107,7 +107,12 @@ class PricingService:
         """
         all_base_prices = await self.base_price_repo.get_overlapping(prop.id, start_date, end_date)
         rules = await self.pricing_repo.get_overlapping(prop.id, start_date, end_date)
+        return self._resolve_nights(prop, all_base_prices, rules, start_date, end_date)
 
+    def _resolve_nights(
+        self, prop, all_base_prices, rules: list[PricingRule], start_date: date, end_date: date
+    ) -> list[dict]:
+        """Per-night prices from pre-fetched base prices and precedence-ordered rules."""
         nights = []
         current = start_date
         while current < end_date:
@@ -138,6 +143,22 @@ class PricingService:
     async def quote_property(self, prop, check_in: date, check_out: date) -> Decimal:
         """Total for an already-loaded property (avoids re-fetching it per candidate)."""
         nights = await self._nightly_prices(prop, check_in, check_out)
+        return self._total(nights)
+
+    async def quote_properties(self, props, check_in: date, check_out: date) -> dict[uuid.UUID, Decimal]:
+        """`quote_property` for many loaded properties in two queries total: {property_id: total}."""
+        if not props:
+            return {}
+        ids = [p.id for p in props]
+        base_prices = await self.base_price_repo.get_overlapping_for_properties(ids, check_in, check_out)
+        rules = await self.pricing_repo.get_overlapping_for_properties(ids, check_in, check_out)
+        return {
+            p.id: self._total(self._resolve_nights(p, base_prices[p.id], rules[p.id], check_in, check_out))
+            for p in props
+        }
+
+    @staticmethod
+    def _total(nights: list[dict]) -> Decimal:
         return round(sum((n["price"] for n in nights), Decimal(0)), 2)
 
     # ------------------------------------------------------------------ #

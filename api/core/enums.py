@@ -47,3 +47,4 @@ class BotFailureReason(str, enum.Enum):
     INVALID_DATES = "invalid_dates"
     PROPERTY_NOT_FOUND = "property_not_found"
     CAPACITY_UNKNOWN = "capacity_unknown"
+    INVALID_INPUT = "invalid_input"  # malformed request body (instead of HTTP 422)
