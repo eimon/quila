@@ -22,27 +22,29 @@ interface FinancialReportProps {
 
 export default function FinancialReport({ propertyId }: FinancialReportProps) {
     const [currentDate, setCurrentDate] = useState(new Date());
-    const [summary, setSummary] = useState<FinancialSummary | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    // Keyed by request so loading is derived instead of set synchronously in the effect
+    const [loaded, setLoaded] = useState<{ key: string; summary: FinancialSummary | null } | null>(null);
 
     const t = useTranslations("Reports");
     const tCommon = useTranslations("Common");
     const locale = useLocale();
 
-    useEffect(() => {
-        fetchData();
-    }, [currentDate, propertyId]);
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth() + 1;
+    const requestKey = `${propertyId}:${year}-${month}`;
 
-    const fetchData = async () => {
-        setIsLoading(true);
-        const data = await getFinancialSummary(
-            propertyId,
-            currentDate.getFullYear(),
-            currentDate.getMonth() + 1
-        );
-        setSummary(data);
-        setIsLoading(false);
-    };
+    useEffect(() => {
+        let cancelled = false;
+        getFinancialSummary(propertyId, year, month).then((data) => {
+            if (!cancelled) setLoaded({ key: requestKey, summary: data });
+        });
+        return () => {
+            cancelled = true;
+        };
+    }, [propertyId, year, month, requestKey]);
+
+    const isLoading = loaded?.key !== requestKey;
+    const summary = loaded && !isLoading ? loaded.summary : null;
 
     const prevMonth = () => {
         setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));

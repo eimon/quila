@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { createPricingRule, PricingRuleFormState } from "@/actions/pricing";
 import { Plus, X, Loader2 } from "lucide-react";
 import { useActionState } from "react";
@@ -21,14 +21,13 @@ export default function AddPricingRuleDialog({ propertyId, basePrice }: AddPrici
     const t = useTranslations("Common");
     const tProp = useTranslations("Properties");
 
-    const createRuleWithId = createPricingRule.bind(null, propertyId);
-    const [state, formAction, isPending] = useActionState(createRuleWithId, initialState);
-
-    useEffect(() => {
-        if (state.success && isOpen) {
-            setIsOpen(false);
-        }
-    }, [state.success, isOpen]);
+    // Close from the action itself instead of syncing state in an effect
+    const submit = async (prevState: PricingRuleFormState, formData: FormData): Promise<PricingRuleFormState> => {
+        const result = await createPricingRule(propertyId, prevState, formData);
+        if (result.success) setIsOpen(false);
+        return result;
+    };
+    const [state, formAction, isPending] = useActionState(submit, initialState);
 
     return (
         <>

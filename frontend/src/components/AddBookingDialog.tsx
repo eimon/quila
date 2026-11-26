@@ -30,6 +30,14 @@ export default function AddBookingDialog() {
 
     const selectedProperty = properties.find((p) => p.id === selectedPropertyId) ?? null;
 
+    const handleClose = () => {
+        setIsOpen(false);
+        setStep("property");
+        setSelectedPropertyId("");
+        setSelectedDates(null);
+        setPriceQuote(null);
+    };
+
     const wrappedCreateBooking = async (prevState: BookingFormState, formData: FormData): Promise<BookingFormState> => {
         const result = await createBooking(prevState, formData);
         if (result.success) handleClose();
@@ -48,14 +56,6 @@ export default function AddBookingDialog() {
         setProperties(props);
         setGuests(gst);
         setIsLoadingData(false);
-    };
-
-    const handleClose = () => {
-        setIsOpen(false);
-        setStep("property");
-        setSelectedPropertyId("");
-        setSelectedDates(null);
-        setPriceQuote(null);
     };
 
     const handleContinue = () => {

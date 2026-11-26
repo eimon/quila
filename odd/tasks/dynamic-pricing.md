@@ -54,7 +54,11 @@ The product (Quila) is a white-label booking system for a single cabin business,
   - RED: 4 new tests in `tests/test_pricing.py`; pytest -> 7 failed, 77 passed (`test_date_change_recomputes_total_with_current_rules`, `test_date_change_on_paid_booking_recomputes_total_keeps_payment` + the 5 documented).
   - GREEN: pytest -> 5 failed, 79 passed (only the 5 documented pre-existing failures).
   - Behavior: after the validity/conflict checks, if the effective `(check_in, check_out)` differs from the stored one, `total_amount` is re-quoted with `PricingService.calculate_booking_total` (current rules); a failed quote fails the update. Resending the same dates (forms send every field) or changing other fields keeps the snapshot. PAID bookings: `total_amount` is recomputed, `status`, `paid_amount`, `paid_at`, `payment_method` are never touched (the summary keeps using `paid_amount` when recorded). Documented in `api/API_ENDPOINTS.md`.
-- [ ] T7 Make `npm run lint` run and pass in `frontend/` (ESLint cannot resolve `eslint-config-next/core-web-vitals`; pre-existing on master). Route: delegated.
+- [x] T7 Make `npm run lint` run and pass in `frontend/` (ESLint cannot resolve `eslint-config-next/core-web-vitals`; pre-existing on master). Route: delegated.
+  - Root cause: `package.json` pinned `eslint-config-next@^0.2.4`, an unrelated 2017 package (Babel config by mvila) with no `core-web-vitals`/`typescript` exports. Next.js' own config is versioned with Next; aligned to `eslint-config-next@^16.1.6` (matches `next@16.1.6`).
+  - Second issue: with ESLint 10, `eslint-plugin-react` (peer `eslint ^9.7`) crashes in React version auto-detection (`context.getFilename` was removed in ESLint 10). Fixed with an explicit `settings.react.version` in `eslint.config.mjs` instead of downgrading ESLint (alternative: `eslint@^9`, the plugin's supported range).
+  - Lint then reported 8 errors / 4 warnings, fixed in code: `any` casts replaced by next-intl `hasLocale` (layout, `i18n/request.ts`) and a plain `t(item.name)` (Sidebar); guest/user/pricing-rule dialogs close from the action wrapper instead of mutating `useActionState` state during render or calling `setState` in an effect (this also fixes the pricing-rule dialog closing itself when reopened after a success); `AddBookingDialog` declares `handleClose` before use; `FinancialReport` fetches inside the effect with a cancel flag and derives loading from a request key.
+  - Evidence: `npm run lint` -> exit 0, 0 errors, 3 warnings (unused imports and an expression statement, left as is). `npx tsc --noEmit` -> exit 0. `npm run build` -> exit 0.
 
 ## Acceptance criteria
 
@@ -76,7 +80,8 @@ The product (Quila) is a white-label booking system for a single cabin business,
 - T3 committed: `17a7114`.
 - T4 committed: `e6127ee`.
 - T5 committed: `6cfe287`.
+- T6 committed: `0006909`.
 
 ## Next step
 
-All tasks done. Pending human decisions: native review per RDD and push/PR. Known environmental issue: `npm run lint` fails to load `eslint-config-next/core-web-vitals`.
+All tasks done. Pending human decisions: native review per RDD and push/PR. `npm run lint` passes since T7.
