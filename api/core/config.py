@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     # iCalendar
     DOMAIN: str = "example.com"
 
+    # Chatbot integration (/bot/*). Empty key = bot endpoints disabled.
+    BOT_API_KEY: str = ""
+
     class Config:
         case_sensitive = True
 

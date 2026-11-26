@@ -6,6 +6,7 @@ services:
       SECRET_KEY: ${SECRET_KEY:-supersecretkey}
       ALGORITHM: ${ALGORITHM:-HS256}
       DATABASE_URL: postgresql+asyncpg://postgres:${POSTGRES_PASSWORD:-password}@quila_db:5432/quila_db
+      BOT_API_KEY: ${BOT_API_KEY:-}
       VIRTUAL_HOST: ${API_HOST:-localhost}
       VIRTUAL_PORT: 8000
       LETSENCRYPT_HOST: ${API_HOST:-localhost}

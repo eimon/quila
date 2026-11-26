@@ -134,6 +134,22 @@ async def owner_headers(owner_user):
     return {"Authorization": f"Bearer {_make_token(owner_user)}"}
 
 
+# ---------- Bot fixtures ----------
+
+BOT_TEST_KEY = "test-bot-key"
+
+
+@pytest.fixture
+def bot_key(monkeypatch):
+    monkeypatch.setattr(settings, "BOT_API_KEY", BOT_TEST_KEY)
+    return BOT_TEST_KEY
+
+
+@pytest.fixture
+def bot_headers(bot_key):
+    return {"Authorization": f"Bearer {bot_key}"}
+
+
 # ---------- Domain fixtures ----------
 
 @pytest.fixture

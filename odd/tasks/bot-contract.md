@@ -49,7 +49,7 @@ The client sells cabin stays through a chatbot that answers and pre-reserves, an
 ## Tasks
 
 - [x] T1 Catalog fields on Property (model, migration 012, schemas, panel forms) and public catalog export. Route: delegated. Evidence: pytest 87 passed / 5 known failures (new `test_public_catalog.py` + catalog field tests in `test_properties.py`); `tsc --noEmit` clean; lint 0 errors (3 pre-existing warnings); `npm run build` ok.
-- [ ] T2 Bot auth dependency (`BOT_API_KEY`) and `/bot` router skeleton with the structured-outcome convention. Route: delegated.
+- [x] T2 Bot auth dependency (`BOT_API_KEY`) and `/bot` router skeleton with the structured-outcome convention. Route: delegated. Evidence: pytest 95 passed / 5 known failures (`test_bot_auth.py`: valid key, missing key, wrong keys, user JWT, env unset -> 503).
 - [ ] T3 Availability + quote bot endpoints with lazy hold expiry in the repository. Test-first. Route: delegated.
 - [ ] T4 Holds: booking fields (`expires_at`, `guests`, `lead_name`, `lead_phone`, `lead_email`), `BookingSource.CHATBOT`, `HOLD_TTL_HOURS`, migration 013, `POST /bot/holds`, accept clears expiry; panel shows lead data and expiry. Test-first. Route: delegated.
 - [ ] T5 Docs (`AGENTS.md`, `api/API_ENDPOINTS.md`, `.env.example`) including the tool JSON Schemas to register in chatv2. Route: delegated.
@@ -70,6 +70,7 @@ The client sells cabin stays through a chatbot that answers and pre-reserves, an
 ## Progress
 
 - Branch `feat/bot-contract` created from master `0147ca1`.
+- T1 committed `76005f4`.
 
 ## Next step
 

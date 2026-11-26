@@ -37,3 +37,12 @@ class DocumentType(str, enum.Enum):
 class PricingAdjustmentType(str, enum.Enum):
     PERCENTAGE = "PERCENTAGE"    # base_price * (1 + value / 100)
     FIXED_PRICE = "FIXED_PRICE"  # value replaces the nightly price
+
+
+class BotFailureReason(str, enum.Enum):
+    """Business outcome codes returned to the chatbot with HTTP 200 and ok=false."""
+    UNAVAILABLE = "unavailable"
+    OVER_CAPACITY = "over_capacity"
+    INVALID_DATES = "invalid_dates"
+    PROPERTY_NOT_FOUND = "property_not_found"
+    CAPACITY_UNKNOWN = "capacity_unknown"
