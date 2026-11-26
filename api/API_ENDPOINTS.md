@@ -300,7 +300,7 @@ Crear reserva.
 }
 ```
 > Valida automáticamente conflictos de fechas.
-> `total_amount` se cotiza al crear la reserva (mismo cálculo que `price-quote`) y queda como snapshot: cambiar reglas de precio no lo modifica. Si la cotización falla (p. ej. propiedad inexistente), la reserva no se crea.
+> `total_amount` se cotiza al crear la reserva (mismo cálculo que `price-quote`) y queda como snapshot: cambiar reglas de precio no lo modifica. Solo se recalcula si cambian las fechas de la reserva (`PUT /bookings/{booking_id}`). Si la cotización falla (p. ej. propiedad inexistente), la reserva no se crea.
 
 **Response:** `201 Created`
 ```json
@@ -365,7 +365,7 @@ Actualizar reserva.
   "status": "CONFIRMED" | "TENTATIVE" | "CANCELLED (optional)"
 }
 ```
-> Valida conflictos si se actualizan fechas
+> Valida conflictos si se actualizan fechas. Si las fechas cambian de verdad, `total_amount` se vuelve a cotizar con las reglas vigentes (mismo cálculo que al crear); si la cotización falla, la actualización falla. Reenviar las mismas fechas o cambiar otros campos no toca el total. En reservas `PAID` se recalcula `total_amount` pero nunca se modifican `paid_amount`, `paid_at` ni `payment_method`.
 
 **Response:** `200 OK` (Objeto reserva actualizado)
 

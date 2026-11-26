@@ -119,6 +119,15 @@ class BookingService:
                     f"Conflicto de fechas con {len(conflicts)} reserva(s) existente(s)"
                 )
 
+            # A real date change re-quotes with the current rules, as creation does.
+            # Resending the same dates keeps the snapshot. Payment fields are never touched.
+            if (check_in, check_out) != (existing.check_in, existing.check_out):
+                from services.pricing_service import PricingService
+                # A failed quote aborts the update: never store a stale or null total
+                existing.total_amount = await PricingService(self.db).calculate_booking_total(
+                    existing.property_id, check_in, check_out
+                )
+
         booking = await self.booking_repo.update(booking_id, booking_update)
         if not booking:
             raise NotFoundException("Reserva no encontrada")

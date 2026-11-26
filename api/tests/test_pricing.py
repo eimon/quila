@@ -417,6 +417,78 @@ async def test_rule_change_does_not_alter_existing_booking_total(client, admin_h
     assert float(resp.json()["total_amount"]) == 300.0
 
 
+async def _book_with_rule(client, admin_headers, pid):
+    """Create a +50% January rule and a 2-night booking (Jan 10-12, total 300)."""
+    rule = await client.post(
+        _rules_url(pid),
+        json=_rule_payload(start_date="2027-01-01", end_date="2027-01-31", adjustment_value="50.00"),
+        headers=admin_headers,
+    )
+    booking = await client.post(
+        "/bookings/",
+        json={"property_id": pid, "check_in": "2027-01-10", "check_out": "2027-01-12", "summary": "Dates"},
+        headers=admin_headers,
+    )
+    assert booking.status_code == 201
+    assert float(booking.json()["total_amount"]) == 300.0
+    # Rule edited after booking: only a date change may pick it up
+    resp = await client.put(
+        f"/pricing-rules/{rule.json()['id']}",
+        json={"adjustment_value": "100.00"},
+        headers=admin_headers,
+    )
+    assert resp.status_code == 200
+    return booking.json()["id"]
+
+
+async def test_date_change_recomputes_total_with_current_rules(client, admin_headers, test_property):
+    booking_id = await _book_with_rule(client, admin_headers, test_property["id"])
+
+    resp = await client.put(f"/bookings/{booking_id}", json={"check_out": "2027-01-13"}, headers=admin_headers)
+    assert resp.status_code == 200
+    assert float(resp.json()["total_amount"]) == 600.0  # 3 nights * 100 * 2.0
+
+
+async def test_non_date_update_keeps_total(client, admin_headers, test_property):
+    booking_id = await _book_with_rule(client, admin_headers, test_property["id"])
+
+    resp = await client.put(f"/bookings/{booking_id}", json={"summary": "Renamed"}, headers=admin_headers)
+    assert resp.status_code == 200
+    assert float(resp.json()["total_amount"]) == 300.0
+
+
+async def test_resending_same_dates_keeps_total(client, admin_headers, test_property):
+    """Forms resend every field: unchanged dates must not re-quote with current rules."""
+    booking_id = await _book_with_rule(client, admin_headers, test_property["id"])
+
+    resp = await client.put(
+        f"/bookings/{booking_id}",
+        json={"check_in": "2027-01-10", "check_out": "2027-01-12", "summary": "Same dates"},
+        headers=admin_headers,
+    )
+    assert resp.status_code == 200
+    assert float(resp.json()["total_amount"]) == 300.0
+
+
+async def test_date_change_on_paid_booking_recomputes_total_keeps_payment(client, admin_headers, test_property):
+    booking_id = await _book_with_rule(client, admin_headers, test_property["id"])
+    pay = await client.post(
+        f"/bookings/{booking_id}/pay",
+        json={"paid_at": "2027-01-01", "payment_method": "CASH", "paid_amount": "280.00"},
+        headers=admin_headers,
+    )
+    assert pay.status_code == 200
+
+    resp = await client.put(f"/bookings/{booking_id}", json={"check_in": "2027-01-11"}, headers=admin_headers)
+    assert resp.status_code == 200
+    data = resp.json()
+    assert float(data["total_amount"]) == 200.0  # 1 night * 100 * 2.0
+    assert float(data["paid_amount"]) == 280.0
+    assert data["status"] == "PAID"
+    assert data["paid_at"] == "2027-01-01"
+    assert data["payment_method"] == "CASH"
+
+
 async def test_create_booking_fails_when_quote_fails(client, admin_headers):
     """The booking must not be stored with a null total when pricing fails."""
     resp = await client.post(

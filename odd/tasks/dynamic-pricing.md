@@ -50,6 +50,12 @@ The product (Quila) is a white-label booking system for a single cabin business,
 - [x] T5 Docs: `AGENTS.md`, `api/AGENTS.md`, `api/API_ENDPOINTS.md`, `frontend/AGENTS.md`. Route: delegated.
   - Evidence: docs describe the adjustment-based pricing model, priority resolution, booking total snapshots, revenue-only summary, and no longer mention costs, floor price, profitability or `avg_stay_days`. `rg -il "cost|floor_price|avg_stay|profitability" api frontend/src frontend/messages` -> only old migrations (001/003/006, untouchable), migrations 010/011 (they drop those objects), tests asserting the removed fields are absent, a test address ("Av. Costanera"), and `API_ENDPOINTS.md` saying the summary has no costs. Also touched `frontend/README.md`, which described the costs UI.
 
+- [x] T6 Recalculate `total_amount` when a booking's dates change in `update_booking` (rule edits still never touch existing bookings). Source: independent verifier finding (pre-existing in Domu; matters now because the revenue summary uses the snapshot). Test-first. Route: delegated.
+  - RED: 4 new tests in `tests/test_pricing.py`; pytest -> 7 failed, 77 passed (`test_date_change_recomputes_total_with_current_rules`, `test_date_change_on_paid_booking_recomputes_total_keeps_payment` + the 5 documented).
+  - GREEN: pytest -> 5 failed, 79 passed (only the 5 documented pre-existing failures).
+  - Behavior: after the validity/conflict checks, if the effective `(check_in, check_out)` differs from the stored one, `total_amount` is re-quoted with `PricingService.calculate_booking_total` (current rules); a failed quote fails the update. Resending the same dates (forms send every field) or changing other fields keeps the snapshot. PAID bookings: `total_amount` is recomputed, `status`, `paid_amount`, `paid_at`, `payment_method` are never touched (the summary keeps using `paid_amount` when recorded). Documented in `api/API_ENDPOINTS.md`.
+- [ ] T7 Make `npm run lint` run and pass in `frontend/` (ESLint cannot resolve `eslint-config-next/core-web-vitals`; pre-existing on master). Route: delegated.
+
 ## Acceptance criteria
 
 - No cost tables, endpoints, or UI remain; migrations upgrade from an empty DB to head.
@@ -69,7 +75,7 @@ The product (Quila) is a white-label booking system for a single cabin business,
 - T2 committed: `276f26d`.
 - T3 committed: `17a7114`.
 - T4 committed: `e6127ee`.
-- T5 committed: see the final report (a commit cannot contain its own hash).
+- T5 committed: `6cfe287`.
 
 ## Next step
 
