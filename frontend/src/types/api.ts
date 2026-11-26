@@ -87,6 +87,13 @@ export interface Property {
     base_price: number; // Precio bruto por noche
     latitude?: number | null;
     longitude?: number | null;
+    // Catalog (public catalog + chatbot); null on legacy properties
+    max_guests?: number | null;
+    amenities?: string[] | null;
+    check_in_time?: string | null; // HH:MM:SS
+    check_out_time?: string | null; // HH:MM:SS
+    cancellation_policy?: string | null;
+    house_rules?: string | null;
     created_at: string; // datetime
     updated_at: string; // datetime
     is_active: boolean;

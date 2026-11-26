@@ -122,7 +122,17 @@
             "basePrice": "Base Price",
             "submit": "Create Property",
             "subtitle": "Enter the details of the property you want to manage.",
-            "basePriceHint": "Gross price per night guests pay when no pricing rule applies"
+            "basePriceHint": "Gross price per night guests pay when no pricing rule applies",
+            "catalogSection": "Guest catalog",
+            "catalogHint": "Data published in the public catalog and used by the chatbot.",
+            "maxGuests": "Max guests",
+            "checkInTime": "Check-in time",
+            "checkOutTime": "Check-out time",
+            "amenities": "Amenities",
+            "amenitiesPlaceholder": "Wifi\nBarbecue\nParking",
+            "amenitiesHint": "One amenity per line",
+            "cancellationPolicy": "Cancellation policy",
+            "houseRules": "House rules"
         }
     },
     "Calendar": {

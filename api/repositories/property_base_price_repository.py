@@ -90,6 +90,22 @@ class PropertyBasePriceRepository:
         )
         return result.scalars().first()
 
+    async def get_at_date_for_properties(
+        self, property_ids: list[uuid.UUID], ref_date: date
+    ) -> dict[uuid.UUID, Decimal]:
+        """Active base price value at ref_date for each property, in one query."""
+        if not property_ids:
+            return {}
+        result = await self.db.execute(
+            select(PropertyBasePrice).where(
+                PropertyBasePrice.property_id.in_(property_ids),
+                PropertyBasePrice.is_active == True,
+                or_(PropertyBasePrice.start_date == None, PropertyBasePrice.start_date <= ref_date),
+                or_(PropertyBasePrice.end_date == None, PropertyBasePrice.end_date >= ref_date),
+            )
+        )
+        return {r.property_id: r.value for r in result.scalars().all()}
+
     async def get_overlapping(
         self, property_id: uuid.UUID, range_start: date, range_end: date
     ) -> list[PropertyBasePrice]:

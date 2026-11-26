@@ -122,7 +122,17 @@
             "basePrice": "Precio Base",
             "submit": "Crear Propiedad",
             "subtitle": "Ingresá los detalles de la propiedad que querés gestionar.",
-            "basePriceHint": "Precio bruto por noche que pagan los huéspedes cuando no aplica ninguna regla"
+            "basePriceHint": "Precio bruto por noche que pagan los huéspedes cuando no aplica ninguna regla",
+            "catalogSection": "Catálogo para huéspedes",
+            "catalogHint": "Datos que se publican en el catálogo público y usa el chatbot.",
+            "maxGuests": "Capacidad máxima",
+            "checkInTime": "Hora de check-in",
+            "checkOutTime": "Hora de check-out",
+            "amenities": "Comodidades",
+            "amenitiesPlaceholder": "Wifi\nParrilla\nEstacionamiento",
+            "amenitiesHint": "Una comodidad por línea",
+            "cancellationPolicy": "Política de cancelación",
+            "houseRules": "Reglas de la casa"
         }
     },
     "Calendar": {
