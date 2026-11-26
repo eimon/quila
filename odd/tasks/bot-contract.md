@@ -84,3 +84,17 @@ The client sells cabin stays through a chatbot that answers and pre-reserves, an
 ## Next step
 
 Parent: delivery slicing (branch exceeds about 400 authored lines), native review, push/PR. Follow-up (pre-existing, out of scope): `PricingService.get_calendar` checks conflicts with an exclusive `end_date` while it prices `end_date` inclusive, so a booking starting on the last calendar day shows AVAILABLE.
+
+## Slices (feature-branch-chain)
+
+Tracker PR #3 (`feat/bot-contract` → `master`, draft; empty commit `d79a956`).
+
+| PR | Branch | Base | Commits | Changed lines |
+|----|--------|------|---------|---------------|
+| #4 | `feat/bot-contract-01-catalog` | `feat/bot-contract` | `76005f4` (T1) | 618 |
+| #5 | `feat/bot-contract-02-bot-api` | `01-catalog` | `cbb6b4c` (T2), `2548aa4` (T3) | 556 |
+| #6 | `feat/bot-contract-03-holds` | `02-bot-api` | `1e9a9ab` (T4) | 641 |
+| #7 | `feat/bot-contract-04-docs` | `03-holds` | `573ac1f` (T5) | 272 |
+| #8 | `feat/bot-contract-05-hardening` | `04-docs` | `07f0a6a` (T6), `8121e64` (compose `BUSINESS_TIMEZONE`), plus this doc update | 517+ |
+
+PRs #4, #5, #6 and #8 carry `size:exception` (see each PR body). Merge order: #4 → #5 → #6 → #7 → #8 into their parents, then mark #3 ready and merge it into `master`.
