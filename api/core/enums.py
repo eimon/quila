@@ -32,3 +32,8 @@ class DocumentType(str, enum.Enum):
     DU = "DU"  # Documento Único (Argentina - solo números)
     EXTRANJERO = "EXTRANJERO"  # Documento extranjero (alfanumérico)
 
+
+
+class PricingAdjustmentType(str, enum.Enum):
+    PERCENTAGE = "PERCENTAGE"    # base_price * (1 + value / 100)
+    FIXED_PRICE = "FIXED_PRICE"  # value replaces the nightly price

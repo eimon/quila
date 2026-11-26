@@ -113,20 +113,6 @@ class BookingRepository:
         )
         return result.scalars().first() is not None
 
-    async def exists_paid_booking_overlap(
-        self, property_id: uuid.UUID, range_start: date, range_end: date
-    ) -> bool:
-        """Returns True if any PAID booking overlaps with [range_start, range_end]."""
-        result = await self.db.execute(
-            select(Booking.id).where(
-                Booking.property_id == property_id,
-                Booking.status == BookingStatus.PAID,
-                Booking.check_out > range_start,
-                Booking.check_in <= range_end,
-            ).limit(1)
-        )
-        return result.scalars().first() is not None
-
     async def update(self, booking_id: uuid.UUID, booking_update: BookingUpdate) -> Booking | None:
         db_booking = await self.get_by_id(booking_id)
         if not db_booking:

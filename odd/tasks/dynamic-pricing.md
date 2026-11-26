@@ -39,7 +39,11 @@ The product (Quila) is a white-label booking system for a single cabin business,
 - [x] T2 Remove costs module (backend + migration 010 + revenue-only financial summary). Route: delegated — writer trigger (2+ non-trivial files).
   - Evidence: pytest -> 5 failed, 53 passed (only the 5 documented pre-existing failures; `test_costs.py` removed). Entrypoint `alembic upgrade head` reached `010` on a DB at `009`; `property_costs`, `costcategory`, `costcalculationtype` and `properties.avg_stay_days` gone.
   - Financial summary now returns `total_income`, `paid_income`, `pending_income` (+ occupancy). Income per booking = `paid_amount` if recorded, else the `total_amount` snapshot, prorated by nights inside the month; bookings without a stored total fall back to current nightly prices. Nights are counted up to the first day of the next month (the previous code dropped the month's last night).
-- [ ] T3 New pricing rule model + formula + migration 011; batch rule lookup (no N+1); booking creation fails loudly if the quote fails instead of storing a null total; drop the "no rule changes over PAID bookings" and "no overlap" restrictions. Test-first. Route: delegated.
+- [x] T3 New pricing rule model + formula + migration 011; batch rule lookup (no N+1); booking creation fails loudly if the quote fails instead of storing a null total; drop the "no rule changes over PAID bookings" and "no overlap" restrictions. Test-first. Route: delegated.
+  - RED: 22 new/updated tests in `tests/test_pricing.py` failed before implementation (422 on the new payload, old formula totals, booking created with a missing property).
+  - GREEN: pytest -> 5 failed, 75 passed (only the 5 documented pre-existing failures).
+  - Migrations on a fresh DB: `alembic upgrade head` -> 011; `downgrade -1` twice -> 009; `upgrade head` -> 011. Data round trip of 011 checked by hand (PERCENTAGE -20 -> profitability 80, single-day rule widened to 2 days on downgrade; back up -> PERCENTAGE 0, priority 0).
+  - Decisions: rule dates are inclusive and `end_date >= start_date` (DB check relaxed from `>`); validation in `PricingRuleCreate` (422) and, for partial updates, in the service on the merged values (400); explicit nulls in an update mean "unchanged". Calendar no longer returns `floor_price` / `profitability_percent`. `BookingRepository.exists_paid_booking_overlap` removed (no callers left).
 - [ ] T4 Frontend: remove cost UI, update pricing rule dialogs/table/calendar, revenue-only report, types and messages. Route: delegated.
 - [ ] T5 Docs: `AGENTS.md`, `api/AGENTS.md`, `api/API_ENDPOINTS.md`, `frontend/AGENTS.md`. Route: delegated.
 
@@ -59,6 +63,7 @@ The product (Quila) is a white-label booking system for a single cabin business,
 
 - Branch `feat/dynamic-pricing` created from master `4395eae`.
 - T1 committed: `83a534a`.
+- T2 committed: `276f26d`.
 
 ## Next step
 

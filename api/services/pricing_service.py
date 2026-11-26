@@ -6,13 +6,19 @@ from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.enums import BookingStatus
+from core.enums import BookingStatus, PricingAdjustmentType
 from exceptions.general import BadRequestException, NotFoundException
+from models.pricing_rule import PricingRule
 from repositories.booking_repository import BookingRepository
 from repositories.pricing_rule_repository import PricingRuleRepository
 from repositories.property_base_price_repository import PropertyBasePriceRepository
 from repositories.property_repository import PropertyRepository
-from schemas.pricing_rule import PricingRuleCreate, PricingRuleUpdate
+from schemas.pricing_rule import (
+    PricingRuleCreate,
+    PricingRuleUpdate,
+    validate_adjustment,
+    validate_date_range,
+)
 
 
 class PricingService:
@@ -28,20 +34,12 @@ class PricingService:
     # ------------------------------------------------------------------ #
 
     async def create_rule(self, property_id: uuid.UUID, rule_in: PricingRuleCreate) -> object:
-        if rule_in.start_date >= rule_in.end_date:
-            raise BadRequestException("Fecha fin debe ser posterior a inicio")
-
+        # Dates and adjustment value are validated by PricingRuleCreate.
+        # Overlaps are allowed (priority resolves them) and existing bookings keep
+        # their total_amount snapshot, so no booking check is needed.
         prop = await self.property_repo.get_by_id(property_id)
         if not prop:
             raise NotFoundException("Propiedad no encontrada")
-
-        if await self.pricing_repo.check_overlap(property_id, rule_in.start_date, rule_in.end_date):
-            raise BadRequestException("El período de la regla se solapa con una regla existente")
-
-        if await self.booking_repo.exists_paid_booking_overlap(property_id, rule_in.start_date, rule_in.end_date):
-            raise BadRequestException(
-                "No se puede crear la regla: el período incluye fechas de reservas pagadas"
-            )
 
         return await self.pricing_repo.create(property_id, rule_in)
 
@@ -50,19 +48,18 @@ class PricingService:
         if not db_rule:
             raise NotFoundException("Regla de precio no encontrada")
 
-        start_date = rule_in.start_date or db_rule.start_date
-        end_date = rule_in.end_date or db_rule.end_date
-
-        if start_date >= end_date:
-            raise BadRequestException("Fecha fin debe ser posterior a inicio")
-
-        if await self.pricing_repo.check_overlap(db_rule.property_id, start_date, end_date, exclude_id=rule_id):
-            raise BadRequestException("El período de la regla se solapa con una regla existente")
-
-        if await self.booking_repo.exists_paid_booking_overlap(db_rule.property_id, start_date, end_date):
-            raise BadRequestException(
-                "No se puede modificar la regla: el período incluye fechas de reservas pagadas"
+        # Validate the rule as it will be after the partial update
+        try:
+            validate_date_range(
+                rule_in.start_date or db_rule.start_date,
+                rule_in.end_date or db_rule.end_date,
             )
+            validate_adjustment(
+                rule_in.adjustment_type or db_rule.adjustment_type,
+                rule_in.adjustment_value if rule_in.adjustment_value is not None else db_rule.adjustment_value,
+            )
+        except ValueError as exc:
+            raise BadRequestException(str(exc))
 
         return await self.pricing_repo.update(rule_id, rule_in)
 
@@ -87,22 +84,39 @@ class PricingService:
                 return r.value
         return None
 
+    @staticmethod
+    def _winning_rule(rules: list[PricingRule], ref_date: date) -> Optional[PricingRule]:
+        """First rule covering ref_date from a list already ordered by precedence."""
+        for rule in rules:
+            if rule.start_date <= ref_date <= rule.end_date:
+                return rule
+        return None
+
+    @staticmethod
+    def _apply_rule(base_price: Decimal, rule: Optional[PricingRule]) -> Decimal:
+        if rule is None:
+            return base_price
+        if rule.adjustment_type == PricingAdjustmentType.FIXED_PRICE:
+            return rule.adjustment_value
+        return base_price * (1 + rule.adjustment_value / Decimal(100))
+
     async def _nightly_prices(self, prop, start_date: date, end_date: date) -> list[dict]:
-        """Price of each night in [start_date, end_date) with the rule that produced it."""
+        """Price of each night in [start_date, end_date) with the rule that produced it.
+
+        Base prices and rules are fetched once for the whole range and resolved in memory.
+        """
         all_base_prices = await self.base_price_repo.get_overlapping(prop.id, start_date, end_date)
+        rules = await self.pricing_repo.get_overlapping(prop.id, start_date, end_date)
 
         nights = []
         current = start_date
         while current < end_date:
-            rules = await self.pricing_repo.get_active_rules_for_date(prop.id, current)
-            active_rule = rules[0] if rules else None
-            percent = active_rule.profitability_percent if active_rule else Decimal(100)
-
+            rule = self._winning_rule(rules, current)
             day_base_price = self._base_price_for_date(all_base_prices, current) or prop.base_price
             nights.append({
                 "date": current,
-                "price": day_base_price * (percent / Decimal(100)),
-                "rule": active_rule,
+                "price": self._apply_rule(day_base_price, rule),
+                "rule": rule,
             })
             current += timedelta(days=1)
         return nights

@@ -1,32 +1,51 @@
-from pydantic import BaseModel, UUID4, Field, field_validator
+from pydantic import BaseModel, UUID4, Field, model_validator
 from datetime import date, datetime
 from typing import Optional
 from decimal import Decimal
 
+from core.enums import PricingAdjustmentType
+
+
+def validate_adjustment(adjustment_type: PricingAdjustmentType, adjustment_value: Decimal) -> None:
+    """Raises ValueError when the value is not valid for the adjustment type."""
+    if adjustment_type == PricingAdjustmentType.PERCENTAGE and adjustment_value <= -100:
+        raise ValueError("El porcentaje de ajuste debe ser mayor a -100")
+    if adjustment_type == PricingAdjustmentType.FIXED_PRICE and adjustment_value <= 0:
+        raise ValueError("El precio fijo debe ser mayor a 0")
+
+
+def validate_date_range(start_date: date, end_date: date) -> None:
+    if end_date < start_date:
+        raise ValueError("La fecha de fin no puede ser anterior a la de inicio")
+
 
 class PricingRuleBase(BaseModel):
-    name: str
+    name: str = Field(..., min_length=1, max_length=200)
     start_date: date
     end_date: date
-    profitability_percent: Decimal = Field(..., ge=0, description="Percentage adjustment. 0=Floor, 100=Base")
-
-    @field_validator('end_date')
-    @classmethod
-    def validate_dates(cls, v: date, info) -> date:
-        if 'start_date' in info.data and v < info.data['start_date']:
-            raise ValueError('end_date must be after start_date')
-        return v
+    adjustment_type: PricingAdjustmentType
+    adjustment_value: Decimal = Field(
+        ..., max_digits=12, decimal_places=2,
+        description="PERCENTAGE: % over the base price (> -100). FIXED_PRICE: nightly price (> 0).",
+    )
+    priority: int = Field(default=0, description="Higher wins when rules overlap")
 
 
 class PricingRuleCreate(PricingRuleBase):
-    pass
+    @model_validator(mode="after")
+    def validate_rule(self):
+        validate_date_range(self.start_date, self.end_date)
+        validate_adjustment(self.adjustment_type, self.adjustment_value)
+        return self
 
 
 class PricingRuleUpdate(BaseModel):
-    name: Optional[str] = None
+    name: Optional[str] = Field(None, min_length=1, max_length=200)
     start_date: Optional[date] = None
     end_date: Optional[date] = None
-    profitability_percent: Optional[Decimal] = None
+    adjustment_type: Optional[PricingAdjustmentType] = None
+    adjustment_value: Optional[Decimal] = Field(None, max_digits=12, decimal_places=2)
+    priority: Optional[int] = None
 
 
 class PricingRuleResponse(PricingRuleBase):
