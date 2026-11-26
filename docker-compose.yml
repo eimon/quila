@@ -1,7 +1,7 @@
 services:
   web:
     build: .
-    container_name: domu_api
+    container_name: quila_api
     ports:
       - "8000:8000"
     volumes:
@@ -9,7 +9,7 @@ services:
     environment:
       SECRET_KEY: ${SECRET_KEY:-supersecretkey}
       ALGORITHM: ${ALGORITHM:-HS256}
-      DATABASE_URL: postgresql+asyncpg://postgres:${POSTGRES_PASSWORD:-password}@db:5432/domu_db
+      DATABASE_URL: postgresql+asyncpg://postgres:${POSTGRES_PASSWORD:-password}@db:5432/quila_db
     depends_on:
       db:
         condition: service_healthy
@@ -26,7 +26,7 @@ services:
     build:
       context: ./frontend
       target: dev
-    container_name: domu_frontend
+    container_name: quila_frontend
     ports:
       - "3000:3000"
     volumes:
@@ -35,7 +35,7 @@ services:
       # - /app/.next
     environment:
       - NEXT_PUBLIC_API_URL=http://localhost:8000
-      - INTERNAL_API_URL=http://domu_api:8000
+      - INTERNAL_API_URL=http://quila_api:8000
       - JWT_SECRET_KEY=${SECRET_KEY:-supersecretkey}
       - ALGORITHM=${ALGORITHM:-HS256}
     depends_on:
@@ -44,19 +44,19 @@ services:
 
   db:
     image: postgres:16
-    container_name: domu_db
+    container_name: quila_db
     ports:
       - "5432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
-      POSTGRES_DB: domu_db
+      POSTGRES_DB: quila_db
       TZ: UTC
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d domu_db"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d quila_db"]
       interval: 5s
       timeout: 5s
       retries: 5

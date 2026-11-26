@@ -22,7 +22,7 @@ def upgrade() -> None:
     # Enums
     userrole = postgresql.ENUM("ADMIN", "MANAGER", "OWNER", name="userrole", create_type=False)
     bookingstatus = postgresql.ENUM("CONFIRMED", "TENTATIVE", "CANCELLED", name="bookingstatus", create_type=False)
-    bookingsource = postgresql.ENUM("AIRBNB", "BOOKING", "DOMU", "MANUAL", name="bookingsource", create_type=False)
+    bookingsource = postgresql.ENUM("AIRBNB", "BOOKING", "DIRECT", "MANUAL", name="bookingsource", create_type=False)
     documenttype = postgresql.ENUM("DU", "EXTRANJERO", name="documenttype", create_type=False)
     costcategory = postgresql.ENUM("RECURRING_MONTHLY", "RECURRING_DAILY", "PER_RESERVATION", name="costcategory", create_type=False)
     costcalculationtype = postgresql.ENUM("FIXED_AMOUNT", "PERCENTAGE", name="costcalculationtype", create_type=False)
@@ -97,7 +97,7 @@ def upgrade() -> None:
         sa.Column("summary", sa.String(), nullable=False),
         sa.Column("description", sa.Text(), nullable=True),
         sa.Column("status", bookingstatus, nullable=False, server_default="CONFIRMED"),
-        sa.Column("source", bookingsource, nullable=False, server_default="DOMU"),
+        sa.Column("source", bookingsource, nullable=False, server_default="DIRECT"),
         sa.Column("external_id", sa.String(), nullable=True),
         sa.Column("ical_url", sa.String(), nullable=True),
         sa.Column("last_synced_at", sa.DateTime(timezone=True), nullable=True),

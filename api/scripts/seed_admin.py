@@ -22,7 +22,7 @@ async def seed_admin() -> None:
 
         admin = User(
             username="admin",
-            email="admin@domu.ar",
+            email="admin@example.com",
             hashed_password=get_password_hash("admin"),
             full_name="Administrador",
             role=UserRole.ADMIN,

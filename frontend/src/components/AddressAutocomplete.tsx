@@ -66,7 +66,7 @@ export default function AddressAutocomplete({
                 {
                     headers: {
                         "Accept-Language": "es",
-                        "User-Agent": "Domu/1.0 (domu.ar)",
+                        "User-Agent": "Quila/1.0 (example.com)",
                     },
                 }
             );
@@ -138,7 +138,7 @@ export default function AddressAutocomplete({
                                 e.preventDefault();
                                 handleSelect(s);
                             }}
-                            className="px-3 py-2.5 text-sm cursor-pointer hover:bg-domu-primary/10 flex items-start gap-2 border-b border-white/[0.06] last:border-0 transition-colors"
+                            className="px-3 py-2.5 text-sm cursor-pointer hover:bg-brand-primary/10 flex items-start gap-2 border-b border-white/[0.06] last:border-0 transition-colors"
                         >
                             <MapPin size={14} className="mt-0.5 flex-shrink-0 text-white/30" />
                             <span className="text-white/70">{s.display_name}</span>

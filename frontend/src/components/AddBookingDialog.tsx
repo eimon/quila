@@ -80,7 +80,7 @@ export default function AddBookingDialog() {
         <>
             <button
                 onClick={handleOpen}
-                className="inline-flex items-center px-4 py-2 bg-domu-primary hover:bg-domu-primary/80 text-white rounded-lg transition-colors text-sm font-medium"
+                className="inline-flex items-center px-4 py-2 bg-brand-primary hover:bg-brand-primary/80 text-white rounded-lg transition-colors text-sm font-medium"
             >
                 <Plus size={15} className="mr-2" />
                 {t("add")} {t("bookings")}
@@ -107,7 +107,7 @@ export default function AddBookingDialog() {
                                     value={selectedPropertyId}
                                     onChange={(e) => setSelectedPropertyId(e.target.value)}
                                     disabled={isLoadingData}
-                                    className="w-full px-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none text-sm transition-all"
+                                    className="w-full px-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-brand-primary/60 focus:ring-2 focus:ring-brand-primary/15 outline-none text-sm transition-all"
                                 >
                                     <option value="">
                                         {isLoadingData ? t("loading") : t("selectProperty")}
@@ -129,7 +129,7 @@ export default function AddBookingDialog() {
                                     type="button"
                                     onClick={handleContinue}
                                     disabled={!selectedPropertyId || isLoadingData}
-                                    className="px-4 py-2 bg-domu-primary hover:bg-domu-primary/80 text-white rounded-lg disabled:opacity-40 text-sm font-medium transition-colors"
+                                    className="px-4 py-2 bg-brand-primary hover:bg-brand-primary/80 text-white rounded-lg disabled:opacity-40 text-sm font-medium transition-colors"
                                 >
                                     {tBookings("next")} →
                                 </button>
@@ -192,13 +192,13 @@ export default function AddBookingDialog() {
                                         <div className="grid grid-cols-2 gap-3">
                                             <div>
                                                 <p className="text-xs font-medium text-white/40 mb-1">{tBookings("checkIn")}</p>
-                                                <p className="text-sm font-semibold text-white/80 bg-domu-primary/10 rounded-lg px-3 py-2 font-mono">
+                                                <p className="text-sm font-semibold text-white/80 bg-brand-primary/10 rounded-lg px-3 py-2 font-mono">
                                                     {selectedDates.start}
                                                 </p>
                                             </div>
                                             <div>
                                                 <p className="text-xs font-medium text-white/40 mb-1">{tBookings("checkOut")}</p>
-                                                <p className="text-sm font-semibold text-white/80 bg-domu-primary/10 rounded-lg px-3 py-2 font-mono">
+                                                <p className="text-sm font-semibold text-white/80 bg-brand-primary/10 rounded-lg px-3 py-2 font-mono">
                                                     {selectedDates.end}
                                                 </p>
                                             </div>
@@ -224,7 +224,7 @@ export default function AddBookingDialog() {
                                             <input type="hidden" name="check_out" value={selectedDates.end} />
 
                                             {state?.error && (
-                                                <div className="bg-domu-danger/10 border border-domu-danger/20 text-domu-danger/90 p-3 rounded-lg text-sm">
+                                                <div className="bg-brand-danger/10 border border-brand-danger/20 text-brand-danger/90 p-3 rounded-lg text-sm">
                                                     {state.error}
                                                 </div>
                                             )}
@@ -233,7 +233,7 @@ export default function AddBookingDialog() {
                                                 <label className="block text-xs font-medium text-white/50 mb-1 uppercase tracking-wider">{t("guest")}</label>
                                                 <select
                                                     name="guest_id"
-                                                    className="w-full px-3 py-2 text-sm rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all"
+                                                    className="w-full px-3 py-2 text-sm rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-brand-primary/60 focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all"
                                                 >
                                                     <option value="">{t("anonymous")}</option>
                                                     {guests.map((g) => (
@@ -251,7 +251,7 @@ export default function AddBookingDialog() {
                                                     type="text"
                                                     required
                                                     placeholder="e.g. Family Vacation"
-                                                    className="w-full px-3 py-2 text-sm rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all"
+                                                    className="w-full px-3 py-2 text-sm rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-brand-primary/60 focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all"
                                                 />
                                             </div>
 
@@ -261,7 +261,7 @@ export default function AddBookingDialog() {
                                                     <select
                                                         name="status"
                                                         defaultValue={BookingStatus.CONFIRMED}
-                                                        className="w-full px-3 py-2 text-sm rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all"
+                                                        className="w-full px-3 py-2 text-sm rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-brand-primary/60 focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all"
                                                     >
                                                         {[BookingStatus.CONFIRMED, BookingStatus.TENTATIVE].map((s) => (
                                                             <option key={s} value={s}>{tEnums(`BookingStatus.${s}`)}</option>
@@ -273,7 +273,7 @@ export default function AddBookingDialog() {
                                                     <select
                                                         name="source"
                                                         defaultValue={BookingSource.MANUAL}
-                                                        className="w-full px-3 py-2 text-sm rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all"
+                                                        className="w-full px-3 py-2 text-sm rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-brand-primary/60 focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all"
                                                     >
                                                         {Object.values(BookingSource).map((s) => (
                                                             <option key={s} value={s}>{tEnums(`BookingSource.${s}`)}</option>
@@ -285,7 +285,7 @@ export default function AddBookingDialog() {
                                             <button
                                                 type="submit"
                                                 disabled={isPending}
-                                                className="w-full py-2.5 bg-domu-primary hover:bg-domu-primary/80 text-white rounded-lg disabled:opacity-60 flex items-center justify-center text-sm font-medium transition-colors"
+                                                className="w-full py-2.5 bg-brand-primary hover:bg-brand-primary/80 text-white rounded-lg disabled:opacity-60 flex items-center justify-center text-sm font-medium transition-colors"
                                             >
                                                 {isPending ? <Loader2 className="animate-spin mr-2" size={15} /> : null}
                                                 {t("save")}

@@ -45,7 +45,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
                 </div>
 
                 <div className="mt-3 pt-3 border-t border-white/[0.06]">
-                    <span className="text-xs font-medium px-2 py-1 bg-domu-success/10 text-domu-success rounded-full">
+                    <span className="text-xs font-medium px-2 py-1 bg-brand-success/10 text-brand-success rounded-full">
                         {tCommon('active')}
                     </span>
                 </div>

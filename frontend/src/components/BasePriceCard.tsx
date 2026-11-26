@@ -64,7 +64,7 @@ function ModifyBasePriceDialog({
 
                 <form action={formAction} className="p-6 space-y-4">
                     {state?.error && (
-                        <div className="bg-domu-danger/10 border border-domu-danger/20 text-domu-danger/90 p-3 rounded-lg text-sm">{state.error}</div>
+                        <div className="bg-brand-danger/10 border border-brand-danger/20 text-brand-danger/90 p-3 rounded-lg text-sm">{state.error}</div>
                     )}
 
                     <div className="bg-white/[0.05] rounded-lg px-4 py-3 text-sm border border-white/[0.07]">
@@ -86,7 +86,7 @@ function ModifyBasePriceDialog({
                                 min="0.01"
                                 required
                                 placeholder="0.00"
-                                className="w-full pl-7 pr-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all text-sm"
+                                className="w-full pl-7 pr-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-brand-primary/60 focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all text-sm"
                             />
                         </div>
                     </div>
@@ -99,7 +99,7 @@ function ModifyBasePriceDialog({
                             required
                             defaultValue={defaultDateStr}
                             min={minStr}
-                            className="w-full px-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all text-sm"
+                            className="w-full px-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-brand-primary/60 focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all text-sm"
                         />
                         <p className="text-xs text-white/30 mt-1">{tProp("modifyDateHint")}</p>
                     </div>
@@ -115,7 +115,7 @@ function ModifyBasePriceDialog({
                         <button
                             type="submit"
                             disabled={isPending}
-                            className="px-4 py-2 bg-domu-primary hover:bg-domu-primary/80 text-white rounded-lg disabled:opacity-60 flex items-center text-sm font-medium transition-colors"
+                            className="px-4 py-2 bg-brand-primary hover:bg-brand-primary/80 text-white rounded-lg disabled:opacity-60 flex items-center text-sm font-medium transition-colors"
                         >
                             {isPending ? <Loader2 className="animate-spin mr-2" size={15} /> : null}
                             {tProp("applyChange")}
@@ -155,8 +155,8 @@ export default function BasePriceCard({ property, currentBasePrice }: BasePriceC
             <div className="glass rounded-xl overflow-hidden">
                 <div className="flex items-center justify-between px-6 py-5">
                     <div className="flex items-center gap-4">
-                        <div className="p-2.5 bg-domu-primary/10 rounded-xl">
-                            <TrendingUp size={18} className="text-domu-primary" />
+                        <div className="p-2.5 bg-brand-primary/10 rounded-xl">
+                            <TrendingUp size={18} className="text-brand-primary" />
                         </div>
                         <div>
                             <p className="text-xs text-white/40 uppercase tracking-wider font-medium mb-0.5">
@@ -194,7 +194,7 @@ export default function BasePriceCard({ property, currentBasePrice }: BasePriceC
                         )}
                         <button
                             onClick={() => setIsModifyOpen(true)}
-                            className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-domu-primary/80 border border-domu-primary/25 rounded-lg hover:bg-domu-primary/10 transition-colors"
+                            className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-brand-primary/80 border border-brand-primary/25 rounded-lg hover:bg-brand-primary/10 transition-colors"
                         >
                             {tProp("modifyBasePrice")}
                         </button>

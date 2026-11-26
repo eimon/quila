@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings
 from typing import Optional
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "Domu API"
+    PROJECT_NAME: str = "Quila API"
     API_V1_STR: str = "/api/v1"
     
     # Security
@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     
     # iCalendar
-    DOMAIN: str = "domu.ar"
+    DOMAIN: str = "example.com"
 
     class Config:
         case_sensitive = True

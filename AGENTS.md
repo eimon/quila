@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Domu is a vacation rental management platform (sistema de gestión de alquiler turístico) built with FastAPI. It manages properties, bookings, dynamic pricing, and costs for administrators, managers, and property owners. The project is in Spanish (domain terms, error messages, some endpoint paths like `/auth/perfil`).
+Quila is a vacation rental management platform (sistema de gestión de alquiler turístico) built with FastAPI. It manages properties, bookings, dynamic pricing, and costs for administrators, managers, and property owners. The project is in Spanish (domain terms, error messages, some endpoint paths like `/auth/perfil`).
 
 ## Development Commands
 
@@ -17,16 +17,16 @@ docker compose up --build
 # Swagger UI at http://localhost:8000/docs
 
 # Run tests (inside the running container)
-docker exec domu_api pytest tests/ -v
+docker exec quila_api pytest tests/ -v
 
 # Run Alembic migrations manually
-docker exec domu_api alembic upgrade head
-docker exec domu_api alembic revision --autogenerate -m "description"
+docker exec quila_api alembic upgrade head
+docker exec quila_api alembic revision --autogenerate -m "description"
 ```
 
 Database migrations run automatically on container start via `entrypoint.sh` → `alembic upgrade head`.
 
-**Required environment variables:** `SECRET_KEY`, `DATABASE_URL` (set in docker-compose), optional `ALGORITHM` (default HS256), `DOMAIN` (default domu.ar).
+**Required environment variables:** `SECRET_KEY`, `DATABASE_URL` (set in docker-compose), optional `ALGORITHM` (default HS256), `DOMAIN` (default example.com).
 
 ## Architecture
 
@@ -54,7 +54,7 @@ api/
 ## Key Domain Concepts
 
 - **Pricing model:** Property `base_price` is the gross price per night at 100% profitability. Floor price is calculated from costs. Profitability percentage scales between floor (0%) and base price (100%). PricingRules apply date-range overrides with priority-based resolution and overlap validation.
-- **Bookings** use iCal UIDs, date-only fields (no time component), and validate against date conflicts. Sources: AIRBNB, BOOKING, DOMU, MANUAL.
+- **Bookings** use iCal UIDs, date-only fields (no time component), and validate against date conflicts. Sources: AIRBNB, BOOKING, DIRECT, MANUAL.
 - **Costs** are categorized as RECURRING_MONTHLY, PER_DAY_RESERVATION, or PER_RESERVATION, each either FIXED_AMOUNT or PERCENTAGE.
 
 ## Conventions

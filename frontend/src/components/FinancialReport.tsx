@@ -64,32 +64,32 @@ export default function FinancialReport({ propertyId }: FinancialReportProps) {
             title: t("income"),
             value: `$${formatPrice(summary.total_income)}`,
             icon: TrendingUp,
-            color: "text-domu-success",
-            bg: "bg-domu-success/10",
+            color: "text-brand-success",
+            bg: "bg-brand-success/10",
             detail: `${summary.total_bookings} ${t("totalBookings")}`
         },
         {
             title: t("costs"),
             value: `$${formatPrice(summary.costs.total)}`,
             icon: DollarSign,
-            color: "text-domu-danger",
-            bg: "bg-domu-danger/10",
+            color: "text-brand-danger",
+            bg: "bg-brand-danger/10",
             detail: t("breakdown")
         },
         {
             title: t("netProfit"),
             value: `$${formatPrice(summary.net_profit)}`,
             icon: Briefcase,
-            color: summary.net_profit >= 0 ? "text-domu-success" : "text-domu-warning",
-            bg: summary.net_profit >= 0 ? "bg-domu-success/10" : "bg-domu-warning/10",
+            color: summary.net_profit >= 0 ? "text-brand-success" : "text-brand-warning",
+            bg: summary.net_profit >= 0 ? "bg-brand-success/10" : "bg-brand-warning/10",
             detail: `${summary.profit_margin_percent}% ${t("margin")}`
         },
         {
             title: t("occupancy"),
             value: `${summary.occupancy_rate}%`,
             icon: Calendar,
-            color: "text-domu-primary",
-            bg: "bg-domu-primary/10",
+            color: "text-brand-primary",
+            bg: "bg-brand-primary/10",
             detail: `${summary.occupied_days}/${summary.days_in_month} ${t("occupiedDays")}`
         },
     ] : [];
@@ -124,7 +124,7 @@ export default function FinancialReport({ propertyId }: FinancialReportProps) {
 
             {isLoading ? (
                 <div className="flex flex-col items-center justify-center py-24 glass rounded-2xl gap-4">
-                    <Loader2 className="animate-spin text-domu-primary/60" size={36} />
+                    <Loader2 className="animate-spin text-brand-primary/60" size={36} />
                     <p className="text-white/35 text-sm italic">{tCommon("loading")}</p>
                 </div>
             ) : summary ? (
@@ -155,8 +155,8 @@ export default function FinancialReport({ propertyId }: FinancialReportProps) {
                         {/* Cost Breakdown Table */}
                         <div className="lg:col-span-2 glass rounded-2xl overflow-hidden">
                             <div className="px-6 py-5 border-b border-white/[0.07] flex items-center gap-3">
-                                <div className="p-2 bg-domu-danger/10 rounded-lg">
-                                    <PieChart className="text-domu-danger" size={18} />
+                                <div className="p-2 bg-brand-danger/10 rounded-lg">
+                                    <PieChart className="text-brand-danger" size={18} />
                                 </div>
                                 <h3 className="font-bold text-white/80">{t("breakdown")}</h3>
                             </div>
@@ -174,18 +174,18 @@ export default function FinancialReport({ propertyId }: FinancialReportProps) {
                                     <span className="font-semibold text-white/80">${formatPrice(summary.costs.variable_per_reservation)}</span>
                                 </div>
                                 <div className="flex items-center justify-between px-6 py-4 hover:bg-white/[0.03] transition-colors">
-                                    <span className="text-sm text-domu-warning/80">{t("commissions")} (OTA)</span>
-                                    <span className="font-semibold text-domu-warning/80">-${formatPrice(summary.costs.commissions)}</span>
+                                    <span className="text-sm text-brand-warning/80">{t("commissions")} (OTA)</span>
+                                    <span className="font-semibold text-brand-warning/80">-${formatPrice(summary.costs.commissions)}</span>
                                 </div>
                                 <div className="flex items-center justify-between px-6 py-5 bg-white/[0.03]">
                                     <span className="font-bold text-white/80">{tCommon("value")} {t("costs")}</span>
-                                    <span className="text-lg font-black text-domu-danger">${formatPrice(summary.costs.total)}</span>
+                                    <span className="text-lg font-black text-brand-danger">${formatPrice(summary.costs.total)}</span>
                                 </div>
                             </div>
                         </div>
 
                         {/* Net Profit Summary Card */}
-                        <div className="bg-gradient-to-br from-domu-primary/70 to-violet-600/70 rounded-2xl p-8 text-white shadow-[0_16px_48px_rgba(99,102,241,0.20)] relative overflow-hidden flex flex-col justify-between border border-white/10">
+                        <div className="bg-gradient-to-br from-brand-primary/70 to-violet-600/70 rounded-2xl p-8 text-white shadow-[0_16px_48px_rgba(99,102,241,0.20)] relative overflow-hidden flex flex-col justify-between border border-white/10">
                             <div className="absolute top-0 right-0 p-4 opacity-10">
                                 <TrendingUp size={110} />
                             </div>

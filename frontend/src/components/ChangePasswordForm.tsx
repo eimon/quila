@@ -6,7 +6,7 @@ import { Loader2, CheckCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 const inputCls =
-    "w-full px-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all text-sm";
+    "w-full px-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-brand-primary/60 focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all text-sm";
 const labelCls = "block text-xs font-medium text-white/55 mb-1.5 uppercase tracking-wider";
 
 export default function ChangePasswordForm() {
@@ -21,7 +21,7 @@ export default function ChangePasswordForm() {
     return (
         <form action={formAction} className="space-y-4">
             {errorMessage && (
-                <div className="bg-domu-danger/10 border border-domu-danger/20 text-domu-danger/90 p-3 rounded-lg text-sm">
+                <div className="bg-brand-danger/10 border border-brand-danger/20 text-brand-danger/90 p-3 rounded-lg text-sm">
                     {errorMessage}
                 </div>
             )}
@@ -72,7 +72,7 @@ export default function ChangePasswordForm() {
                 <button
                     type="submit"
                     disabled={isPending}
-                    className="px-4 py-2 bg-domu-primary hover:bg-domu-primary/80 text-white rounded-lg disabled:opacity-60 flex items-center text-sm font-medium transition-colors"
+                    className="px-4 py-2 bg-brand-primary hover:bg-brand-primary/80 text-white rounded-lg disabled:opacity-60 flex items-center text-sm font-medium transition-colors"
                 >
                     {isPending && <Loader2 className="animate-spin mr-2" size={15} />}
                     {isPending ? t("saving") : tCommon("save")}

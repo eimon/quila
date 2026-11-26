@@ -31,8 +31,8 @@ export default async function ProfilePage() {
 
             <div className="glass rounded-2xl p-6 space-y-4">
                 <div className="flex items-center gap-3 pb-4 border-b border-white/[0.08]">
-                    <div className="w-12 h-12 rounded-full bg-domu-primary/20 flex items-center justify-center">
-                        <User size={22} className="text-domu-primary" />
+                    <div className="w-12 h-12 rounded-full bg-brand-primary/20 flex items-center justify-center">
+                        <User size={22} className="text-brand-primary" />
                     </div>
                     <div>
                         <p className="text-white/90 font-semibold text-lg">

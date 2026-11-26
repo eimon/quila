@@ -1,4 +1,4 @@
-# API Endpoints - Domu
+# API Endpoints - Quila
 
 Base URL: `http://localhost:8000/api/v1`
 
@@ -300,7 +300,7 @@ Crear reserva.
   "summary": "string",
   "description": "string (optional)",
   "status": "CONFIRMED" | "TENTATIVE" | "CANCELLED" (default: CONFIRMED),
-  "source": "AIRBNB" | "BOOKING" | "DOMU" | "MANUAL" (default: DOMU)
+  "source": "AIRBNB" | "BOOKING" | "DIRECT" | "MANUAL" (default: DIRECT)
 }
 ```
 > Valida automáticamente conflictos de fechas
@@ -421,7 +421,7 @@ Listar reservas de una propiedad específica.
 
 - `AIRBNB`: Importada de Airbnb
 - `BOOKING`: Importada de Booking.com
-- `DOMU`: Creada en Domu
+- `DIRECT`: Creada directamente en el sistema
 - `MANUAL`: Creada manualmente
 
 ## Roles de Usuario

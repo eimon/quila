@@ -8,13 +8,13 @@
 }
 
 @theme {
-  /* ── Domu brand tokens ── */
-  --color-domu-primary:  #818cf8;
-  --color-domu-base:     #06090f;
-  --color-domu-surface:  #0c1120;
-  --color-domu-success:  #34d399;
-  --color-domu-warning:  #fbbf24;
-  --color-domu-danger:   #f87171;
+  /* ── Brand tokens ── */
+  --color-brand-primary:  #818cf8;
+  --color-brand-base:     #06090f;
+  --color-brand-surface:  #0c1120;
+  --color-brand-success:  #34d399;
+  --color-brand-warning:  #fbbf24;
+  --color-brand-danger:   #f87171;
 }
 
 /* ── Root variables ─────────────────────────── */

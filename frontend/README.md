@@ -1,6 +1,6 @@
-# Domu Frontend
+# Quila Frontend
 
-Una aplicación web moderna para la gestión de propiedades de alquiler turístico, construida con Next.js 16, TypeScript y Tailwind CSS v4. Sirve como frontend para la [API de Domu](https://github.com/eimon/domu-api).
+Una aplicación web moderna para la gestión de propiedades de alquiler turístico, construida con Next.js 16, TypeScript y Tailwind CSS v4. Sirve como frontend para la API de Quila.
 
 ---
 
@@ -45,11 +45,11 @@ Sistema de diseño oscuro con glassmorphism. Documentado en `DESIGN_SYSTEM.md` y
 **Tokens de color:**
 | Token | Valor | Uso |
 |---|---|---|
-| `domu-primary` | `#818cf8` | Acciones principales, links activos |
-| `domu-success` | `#34d399` | Estados positivos, confirmación |
-| `domu-warning` | `#fbbf24` | Advertencias |
-| `domu-danger` | `#f87171` | Errores, eliminación |
-| `domu-base` | `#0f1117` | Fondo base |
+| `brand-primary` | `#818cf8` | Acciones principales, links activos |
+| `brand-success` | `#34d399` | Estados positivos, confirmación |
+| `brand-warning` | `#fbbf24` | Advertencias |
+| `brand-danger` | `#f87171` | Errores, eliminación |
+| `brand-base` | `#0f1117` | Fondo base |
 
 Todos los modales y diálogos usan `glass-modal rounded-2xl shadow-2xl`.
 
@@ -143,7 +143,7 @@ Definidos en `src/types/api.ts`, espejo de los enums del backend:
 | Enum | Valores |
 |---|---|
 | `BookingStatus` | `CONFIRMED`, `TENTATIVE`, `CANCELLED`, `PAID` |
-| `BookingSource` | `AIRBNB`, `BOOKING`, `DOMU`, `MANUAL` |
+| `BookingSource` | `AIRBNB`, `BOOKING`, `DIRECT`, `MANUAL` |
 | `DocumentType` | `DU`, `EXTRANJERO` |
 | `UserRole` | `ADMIN`, `MANAGER`, `OWNER` |
 | `CostCategory` | `RECURRING_MONTHLY`, `PER_DAY_RESERVATION`, `PER_RESERVATION` |

@@ -66,29 +66,29 @@ export default async function DashboardHome() {
             label: t("totalProperties"),
             value: properties.length.toString(),
             icon: Building2,
-            color: "text-domu-primary",
-            bg: "bg-domu-primary/10",
+            color: "text-brand-primary",
+            bg: "bg-brand-primary/10",
         },
         {
             label: t("monthlyIncome"),
             value: `$${formatPrice(totalIncome)}`,
             icon: Wallet,
-            color: "text-domu-success",
-            bg: "bg-domu-success/10",
+            color: "text-brand-success",
+            bg: "bg-brand-success/10",
         },
         {
             label: t("netProfit"),
             value: `$${formatPrice(totalNetProfit)}`,
             icon: totalNetProfit >= 0 ? TrendingUp : ArrowDownRight,
-            color: totalNetProfit >= 0 ? "text-domu-success" : "text-domu-warning",
-            bg: totalNetProfit >= 0 ? "bg-domu-success/10" : "bg-domu-warning/10",
+            color: totalNetProfit >= 0 ? "text-brand-success" : "text-brand-warning",
+            bg: totalNetProfit >= 0 ? "bg-brand-success/10" : "bg-brand-warning/10",
         },
         {
             label: t("avgOccupancy"),
             value: `${Math.round(avgOccupancy)}%`,
             icon: Percent,
-            color: "text-domu-primary",
-            bg: "bg-domu-primary/10",
+            color: "text-brand-primary",
+            bg: "bg-brand-primary/10",
         },
     ];
 
@@ -104,7 +104,7 @@ export default async function DashboardHome() {
                     <p className="text-white/40 mt-1 text-sm capitalize">{t("subtitle", { month: monthName })}</p>
                 </div>
                 {user && (
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-domu-primary/10 text-domu-primary border border-domu-primary/20 capitalize self-start sm:self-auto">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-brand-primary/10 text-brand-primary border border-brand-primary/20 capitalize self-start sm:self-auto">
                         {user.role}
                     </span>
                 )}
@@ -130,7 +130,7 @@ export default async function DashboardHome() {
                 <div className="lg:col-span-2 space-y-3">
                     <div className="flex items-center justify-between">
                         <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wider">{t("propertySummary")}</h2>
-                        <Link href="/properties" className="text-xs text-domu-primary/70 hover:text-domu-primary transition-colors flex items-center gap-1">
+                        <Link href="/properties" className="text-xs text-brand-primary/70 hover:text-brand-primary transition-colors flex items-center gap-1">
                             {t("viewAll")} <ChevronRight size={12} />
                         </Link>
                     </div>
@@ -141,7 +141,7 @@ export default async function DashboardHome() {
                             <p className="text-sm text-white/40 mb-4">{t("noProperties")}</p>
                             <Link
                                 href="/properties/new"
-                                className="inline-flex items-center gap-2 px-4 py-2 bg-domu-primary hover:bg-domu-primary/80 text-white rounded-lg text-sm font-medium transition-colors"
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-brand-primary hover:bg-brand-primary/80 text-white rounded-lg text-sm font-medium transition-colors"
                             >
                                 <Plus size={14} />
                                 {t("addFirstProperty")}
@@ -157,8 +157,8 @@ export default async function DashboardHome() {
                                         href={`/properties/${property.id}`}
                                         className="glass rounded-2xl p-5 hover:bg-white/[0.07] transition-all group flex items-center gap-5 cursor-pointer block"
                                     >
-                                        <div className="p-2.5 bg-domu-primary/8 rounded-xl group-hover:bg-domu-primary/15 transition-colors shrink-0">
-                                            <BedDouble size={18} className="text-domu-primary/70" />
+                                        <div className="p-2.5 bg-brand-primary/8 rounded-xl group-hover:bg-brand-primary/15 transition-colors shrink-0">
+                                            <BedDouble size={18} className="text-brand-primary/70" />
                                         </div>
 
                                         <div className="flex-1 min-w-0">
@@ -176,11 +176,11 @@ export default async function DashboardHome() {
                                                 </div>
                                                 <div className="text-right">
                                                     <p className="text-[10px] text-white/30 uppercase tracking-wider">{t("income")}</p>
-                                                    <p className="text-sm font-semibold text-domu-success/80">${formatPrice(summary.total_income)}</p>
+                                                    <p className="text-sm font-semibold text-brand-success/80">${formatPrice(summary.total_income)}</p>
                                                 </div>
                                                 <div className="text-right">
                                                     <p className="text-[10px] text-white/30 uppercase tracking-wider">{t("profit")}</p>
-                                                    <p className={`text-sm font-semibold ${summary.net_profit >= 0 ? "text-domu-success/80" : "text-domu-warning/80"}`}>
+                                                    <p className={`text-sm font-semibold ${summary.net_profit >= 0 ? "text-brand-success/80" : "text-brand-warning/80"}`}>
                                                         ${formatPrice(summary.net_profit)}
                                                     </p>
                                                 </div>
@@ -206,7 +206,7 @@ export default async function DashboardHome() {
                 <div className="space-y-3">
                     <div className="flex items-center justify-between">
                         <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wider">{t("upcomingCheckIns")}</h2>
-                        <Link href="/bookings" className="text-xs text-domu-primary/70 hover:text-domu-primary transition-colors flex items-center gap-1">
+                        <Link href="/bookings" className="text-xs text-brand-primary/70 hover:text-brand-primary transition-colors flex items-center gap-1">
                             {t("viewAll")} <ChevronRight size={12} />
                         </Link>
                     </div>
@@ -233,7 +233,7 @@ export default async function DashboardHome() {
                                                     <p className="text-[11px] text-white/35 mt-0.5 truncate">{booking.summary}</p>
                                                 </div>
                                                 <div className="text-right shrink-0">
-                                                    <p className={`text-xs font-semibold font-mono ${isToday ? "text-domu-warning" : "text-white/55"}`}>
+                                                    <p className={`text-xs font-semibold font-mono ${isToday ? "text-brand-warning" : "text-white/55"}`}>
                                                         {booking.check_in}
                                                     </p>
                                                     <p className="text-[10px] text-white/30 mt-0.5">{n} {t("nights")}</p>
@@ -242,8 +242,8 @@ export default async function DashboardHome() {
                                             <div className="mt-1.5">
                                                 <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${
                                                     booking.status === "CONFIRMED"
-                                                        ? "bg-domu-success/10 text-domu-success/80"
-                                                        : "bg-domu-warning/10 text-domu-warning/80"
+                                                        ? "bg-brand-success/10 text-brand-success/80"
+                                                        : "bg-brand-warning/10 text-brand-warning/80"
                                                 }`}>
                                                     {tEnums(`BookingStatus.${booking.status}`)}
                                                 </span>

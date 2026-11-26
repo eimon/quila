@@ -81,12 +81,12 @@ function CostCardMenu({
             {open && (
                 <div className="absolute right-0 top-8 z-30 w-48 glass-modal rounded-xl shadow-2xl border border-white/[0.08] overflow-hidden py-1">
                     {item(tCommon("history"), onHistory, "text-white/60")}
-                    {!isFinalized && !isFuture && item(t("modifyCost"), onModify, "text-domu-warning/80")}
+                    {!isFinalized && !isFuture && item(t("modifyCost"), onModify, "text-brand-warning/80")}
                     {!isFinalized && !isFuture && item(t("finalizeCost"), onFinalize, "text-orange-400/80")}
                     {cost.root_cost_id && item(t("revertCost"), onRevert, "text-violet-400/80", isReverting)}
                     <div className="border-t border-white/[0.06] my-1" />
-                    {item(tCommon("edit"), onEdit, "text-domu-primary/80")}
-                    {item(tCommon("delete"), onDelete, "text-domu-danger/80", isDeleting)}
+                    {item(tCommon("edit"), onEdit, "text-brand-primary/80")}
+                    {item(tCommon("delete"), onDelete, "text-brand-danger/80", isDeleting)}
                 </div>
             )}
         </div>
@@ -169,7 +169,7 @@ export default function CostsTable({ costs, propertyId }: CostsTableProps) {
                     type="checkbox"
                     checked={showAll}
                     onChange={(e) => handleToggleShowAll(e.target.checked)}
-                    className="rounded border-white/20 bg-white/[0.06] accent-domu-primary"
+                    className="rounded border-white/20 bg-white/[0.06] accent-brand-primary"
                 />
                 {t("showAllCosts")}
             </label>
@@ -207,7 +207,7 @@ export default function CostsTable({ costs, propertyId }: CostsTableProps) {
                                         <span className="text-[10px] text-white/35">{t("finalized")}</span>
                                     )}
                                     {isFuture && (
-                                        <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-domu-primary/15 text-domu-primary/80">
+                                        <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-brand-primary/15 text-brand-primary/80">
                                             {t("upcoming")}
                                         </span>
                                     )}
@@ -302,7 +302,7 @@ export default function CostsTable({ costs, propertyId }: CostsTableProps) {
                                                 <span className="ml-2 text-xs text-white/35 font-normal">{t("finalized")}</span>
                                             )}
                                             {isFuture && (
-                                                <span className="ml-2 px-1.5 py-0.5 rounded text-[10px] font-medium bg-domu-primary/15 text-domu-primary/80">
+                                                <span className="ml-2 px-1.5 py-0.5 rounded text-[10px] font-medium bg-brand-primary/15 text-brand-primary/80">
                                                     {t("upcoming")}
                                                 </span>
                                             )}
@@ -328,7 +328,7 @@ export default function CostsTable({ costs, propertyId }: CostsTableProps) {
                                                     <History size={15} />
                                                 </button>
                                                 {!isFinalized && !isFuture && (
-                                                    <button onClick={() => setModifyingCost(cost)} className="p-1.5 text-domu-warning/70 hover:bg-domu-warning/10 hover:text-domu-warning rounded-lg transition-colors" title={t("modifyCost")}>
+                                                    <button onClick={() => setModifyingCost(cost)} className="p-1.5 text-brand-warning/70 hover:bg-brand-warning/10 hover:text-brand-warning rounded-lg transition-colors" title={t("modifyCost")}>
                                                         <CalendarClock size={15} />
                                                     </button>
                                                 )}
@@ -342,10 +342,10 @@ export default function CostsTable({ costs, propertyId }: CostsTableProps) {
                                                         <RotateCcw size={15} />
                                                     </button>
                                                 )}
-                                                <button onClick={() => setEditingCost(cost)} className="p-1.5 text-domu-primary/70 hover:bg-domu-primary/10 hover:text-domu-primary rounded-lg transition-colors" title={tCommon("edit")}>
+                                                <button onClick={() => setEditingCost(cost)} className="p-1.5 text-brand-primary/70 hover:bg-brand-primary/10 hover:text-brand-primary rounded-lg transition-colors" title={tCommon("edit")}>
                                                     <Pencil size={15} />
                                                 </button>
-                                                <button onClick={() => handleDelete(cost)} disabled={isDeleting === cost.id} className="p-1.5 text-domu-danger/70 hover:bg-domu-danger/10 hover:text-domu-danger rounded-lg transition-colors disabled:opacity-40" title={tCommon("delete")}>
+                                                <button onClick={() => handleDelete(cost)} disabled={isDeleting === cost.id} className="p-1.5 text-brand-danger/70 hover:bg-brand-danger/10 hover:text-brand-danger rounded-lg transition-colors disabled:opacity-40" title={tCommon("delete")}>
                                                     <Trash2 size={15} />
                                                 </button>
                                             </div>

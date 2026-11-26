@@ -1,6 +1,6 @@
-# Domu Design System — "Obsidian Glass"
+# Quila Design System — "Obsidian Glass"
 
-Visual language for the Domu platform, applicable to both the Next.js web app and the React Native / Expo mobile app.
+Visual language for the Quila platform, applicable to both the Next.js web app and the React Native / Expo mobile app.
 
 ---
 
@@ -8,7 +8,7 @@ Visual language for the Domu platform, applicable to both the Next.js web app an
 
 Dark navy-black base with frosted glass panels, indigo/violet accent, and crisp typography. Inspired by premium property management software.
 
-**One rule:** Everything lives on a dark canvas. Surfaces "float" with glass transparency. The accent color (`domu-primary`) is the only saturated color used for interactive/active states.
+**One rule:** Everything lives on a dark canvas. Surfaces "float" with glass transparency. The accent color (`brand-primary`) is the only saturated color used for interactive/active states.
 
 ---
 
@@ -16,12 +16,12 @@ Dark navy-black base with frosted glass panels, indigo/violet accent, and crisp 
 
 | Token | Hex / Value | Usage |
 |-------|------------|-------|
-| `domu-base` | `#06090f` | App background |
-| `domu-surface` | `#0c1120` | Option/select backgrounds |
-| `domu-primary` | `#818cf8` | Accent, active states, buttons, focus rings |
-| `domu-success` | `#34d399` | Success states, active badges |
-| `domu-warning` | `#fbbf24` | Warning states, tentative badges |
-| `domu-danger` | `#f87171` | Error states, cancel actions |
+| `brand-base` | `#06090f` | App background |
+| `brand-surface` | `#0c1120` | Option/select backgrounds |
+| `brand-primary` | `#818cf8` | Accent, active states, buttons, focus rings |
+| `brand-success` | `#34d399` | Success states, active badges |
+| `brand-warning` | `#fbbf24` | Warning states, tentative badges |
+| `brand-danger` | `#f87171` | Error states, cancel actions |
 
 ### Transparency scale (white over dark backgrounds)
 
@@ -239,7 +239,7 @@ sidebar shadow:     0 0 40px rgba(0,0,0,0.50)
 | `backdrop-blur-*` | `<BlurView intensity={24} tint="dark">` from `expo-blur` |
 | `text-white/90` | `color: 'rgba(255,255,255,0.90)'` |
 | `border-white/8` | `borderColor: 'rgba(255,255,255,0.08)'` |
-| `bg-domu-primary/10` | `backgroundColor: 'rgba(129,140,248,0.10)'` |
+| `bg-brand-primary/10` | `backgroundColor: 'rgba(129,140,248,0.10)'` |
 | `rounded-xl` | `borderRadius: 12` |
 | `rounded-2xl` | `borderRadius: 16` |
 | `divide-y divide-white/5` | `borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.05)'` on each row |

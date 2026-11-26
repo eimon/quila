@@ -25,8 +25,8 @@ export default function CalendarDayCell({
     const baseStyle = selectionStyle
         ? selectionStyle
         : day.status === 'RESERVED'
-            ? 'bg-domu-danger/8 border-domu-danger/20'
-            : 'bg-white/[0.03] border-white/[0.08] hover:border-domu-primary/40';
+            ? 'bg-brand-danger/8 border-brand-danger/20'
+            : 'bg-white/[0.03] border-white/[0.08] hover:border-brand-primary/40';
 
     return (
         <button
@@ -41,16 +41,16 @@ export default function CalendarDayCell({
             </div>
             <div className={`text-xs mt-1 font-semibold ${
                 isEndpointSelected ? 'text-white'
-                : isInRangeSelected ? 'text-domu-primary/80'
-                : day.status === 'RESERVED' ? 'text-domu-danger/70'
-                : 'text-domu-success/80'
+                : isInRangeSelected ? 'text-brand-primary/80'
+                : day.status === 'RESERVED' ? 'text-brand-danger/70'
+                : 'text-brand-success/80'
             }`}>
                 <span className="md:hidden">${formatPriceCompact(day.price)}</span>
                 <span className="hidden md:inline">${formatPrice(day.price)}</span>
             </div>
             {day.rule_name && (
                 <div
-                    className={`text-xs mt-0.5 truncate ${isEndpointSelected ? 'text-white/70' : isInRangeSelected ? 'text-domu-primary/50' : 'text-white/30'}`}
+                    className={`text-xs mt-0.5 truncate ${isEndpointSelected ? 'text-white/70' : isInRangeSelected ? 'text-brand-primary/50' : 'text-white/30'}`}
                     title={day.rule_name}
                 >
                     {day.rule_name}

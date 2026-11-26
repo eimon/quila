@@ -15,13 +15,13 @@ interface BookingDetailModalProps {
 }
 
 const statusStyles: Record<string, string> = {
-    [BookingStatus.CONFIRMED]: "bg-domu-success/12 text-domu-success border-domu-success/20",
-    [BookingStatus.TENTATIVE]: "bg-domu-warning/12 text-domu-warning border-domu-warning/20",
-    [BookingStatus.CANCELLED]: "bg-domu-danger/12 text-domu-danger border-domu-danger/20",
+    [BookingStatus.CONFIRMED]: "bg-brand-success/12 text-brand-success border-brand-success/20",
+    [BookingStatus.TENTATIVE]: "bg-brand-warning/12 text-brand-warning border-brand-warning/20",
+    [BookingStatus.CANCELLED]: "bg-brand-danger/12 text-brand-danger border-brand-danger/20",
     [BookingStatus.PAID]: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
 };
 
-const inputCls = "w-full px-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all text-sm";
+const inputCls = "w-full px-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-brand-primary/60 focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all text-sm";
 
 function nights(checkIn: string, checkOut: string): number {
     return Math.round(
@@ -88,8 +88,8 @@ export default function BookingDetailModal({ booking, property, guest, guests, o
                             <p className="text-sm font-semibold text-white/85 font-mono">{booking.check_in}</p>
                         </div>
                         <div className="px-4 py-3 text-center border-r border-white/[0.07] flex flex-col items-center justify-center">
-                            <Calendar size={14} className="text-domu-primary/60 mb-1" />
-                            <p className="text-sm font-bold text-domu-primary/80">{nightCount}</p>
+                            <Calendar size={14} className="text-brand-primary/60 mb-1" />
+                            <p className="text-sm font-bold text-brand-primary/80">{nightCount}</p>
                             <p className="text-[10px] text-white/35">{t('nights')}</p>
                         </div>
                         <div className="px-4 py-3 text-center">
@@ -146,13 +146,13 @@ export default function BookingDetailModal({ booking, property, guest, guests, o
                             <div>
                                 <Row icon={User} label={tGuest('fullName')} value={guest.full_name} />
                                 <Row icon={Mail} label={tGuest('email')} value={
-                                    <a href={`mailto:${guest.email}`} className="text-domu-primary/80 hover:text-domu-primary transition-colors">
+                                    <a href={`mailto:${guest.email}`} className="text-brand-primary/80 hover:text-brand-primary transition-colors">
                                         {guest.email}
                                     </a>
                                 } />
                                 {guest.phone && (
                                     <Row icon={Phone} label={tGuest('phone')} value={
-                                        <a href={`tel:${guest.phone}`} className="text-domu-primary/80 hover:text-domu-primary transition-colors">
+                                        <a href={`tel:${guest.phone}`} className="text-brand-primary/80 hover:text-brand-primary transition-colors">
                                             {guest.phone}
                                         </a>
                                     } />
@@ -170,7 +170,7 @@ export default function BookingDetailModal({ booking, property, guest, guests, o
                                 </div>
 
                                 {state?.error && (
-                                    <div className="bg-domu-danger/10 border border-domu-danger/20 text-domu-danger/90 p-3 rounded-lg text-sm">
+                                    <div className="bg-brand-danger/10 border border-brand-danger/20 text-brand-danger/90 p-3 rounded-lg text-sm">
                                         {state.error}
                                     </div>
                                 )}
@@ -187,7 +187,7 @@ export default function BookingDetailModal({ booking, property, guest, guests, o
                                 <button
                                     type="submit"
                                     disabled={isPending}
-                                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-domu-primary hover:bg-domu-primary/80 text-white rounded-lg disabled:opacity-60 text-sm font-medium transition-colors"
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-brand-primary hover:bg-brand-primary/80 text-white rounded-lg disabled:opacity-60 text-sm font-medium transition-colors"
                                 >
                                     {isPending
                                         ? <Loader2 size={14} className="animate-spin" />

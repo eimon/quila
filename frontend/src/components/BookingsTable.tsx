@@ -80,11 +80,11 @@ function BookingCardMenu({
             {open && (
                 <div className="absolute right-0 top-8 z-30 w-48 glass-modal rounded-xl shadow-2xl border border-white/[0.08] overflow-hidden py-1">
                     {item(tBooking("viewDetails"), onViewDetails, "text-white/60")}
-                    {isTentative && item(tBooking("accept"), onAccept, "text-domu-success/80")}
+                    {isTentative && item(tBooking("accept"), onAccept, "text-brand-success/80")}
                     {(isTentative || isConfirmed) && item(tBooking("markAsPaid"), onPay, "text-emerald-400/80")}
-                    {isPaid && item(tBooking("revertPayment"), onRevertPayment, "text-domu-warning/80")}
-                    {(isTentative || isConfirmed) && item(t("cancel"), onCancel, "text-domu-danger/80")}
-                    {isCancelled && item(t("delete"), onDelete, "text-domu-danger/80")}
+                    {isPaid && item(tBooking("revertPayment"), onRevertPayment, "text-brand-warning/80")}
+                    {(isTentative || isConfirmed) && item(t("cancel"), onCancel, "text-brand-danger/80")}
+                    {isCancelled && item(t("delete"), onDelete, "text-brand-danger/80")}
                 </div>
             )}
         </div>
@@ -142,9 +142,9 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
 
     const statusBadgeClass = (status: string) => {
         if (status === 'PAID') return 'bg-emerald-500/15 text-emerald-400';
-        if (status === 'CONFIRMED') return 'bg-domu-success/12 text-domu-success';
-        if (status === 'TENTATIVE') return 'bg-domu-warning/12 text-domu-warning';
-        return 'bg-domu-danger/12 text-domu-danger';
+        if (status === 'CONFIRMED') return 'bg-brand-success/12 text-brand-success';
+        if (status === 'TENTATIVE') return 'bg-brand-warning/12 text-brand-warning';
+        return 'bg-brand-danger/12 text-brand-danger';
     };
 
     if (bookings.length === 0) {
@@ -168,7 +168,7 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
                                 <div className="flex items-center gap-2 min-w-0 flex-1">
                                     <Link
                                         href={`/properties/${booking.property_id}`}
-                                        className="text-sm font-semibold text-white/85 hover:text-domu-primary transition-colors flex items-center gap-1 truncate"
+                                        className="text-sm font-semibold text-white/85 hover:text-brand-primary transition-colors flex items-center gap-1 truncate"
                                     >
                                         {getPropertyName(booking.property_id)}
                                         <ExternalLink size={10} className="opacity-40 shrink-0" />
@@ -265,7 +265,7 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
                                 return (
                                     <tr key={booking.id} className="hover:bg-white/[0.03] transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white/80">
-                                            <Link href={`/properties/${booking.property_id}`} className="hover:text-domu-primary flex items-center transition-colors">
+                                            <Link href={`/properties/${booking.property_id}`} className="hover:text-brand-primary flex items-center transition-colors">
                                                 {getPropertyName(booking.property_id)}
                                                 <ExternalLink size={11} className="ml-1 opacity-40" />
                                             </Link>
@@ -281,9 +281,9 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${isPaid ? 'bg-emerald-500/15 text-emerald-400' :
-                                                    isConfirmed ? 'bg-domu-success/12 text-domu-success' :
-                                                        isTentative ? 'bg-domu-warning/12 text-domu-warning' :
-                                                            'bg-domu-danger/12 text-domu-danger'
+                                                    isConfirmed ? 'bg-brand-success/12 text-brand-success' :
+                                                        isTentative ? 'bg-brand-warning/12 text-brand-warning' :
+                                                            'bg-brand-danger/12 text-brand-danger'
                                                 }`}>
                                                 {tEnums(`BookingStatus.${booking.status}`)}
                                             </span>
@@ -318,7 +318,7 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
                                                         <button
                                                             onClick={() => handleAccept(booking)}
                                                             disabled={isLoading}
-                                                            className="p-1.5 text-domu-success/70 hover:bg-domu-success/10 hover:text-domu-success rounded-lg transition-colors disabled:opacity-40"
+                                                            className="p-1.5 text-brand-success/70 hover:bg-brand-success/10 hover:text-brand-success rounded-lg transition-colors disabled:opacity-40"
                                                             title={tBooking('accept')}
                                                         >
                                                             <Check size={15} />
@@ -326,7 +326,7 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
                                                         <button
                                                             onClick={() => handleCancel(booking)}
                                                             disabled={isLoading}
-                                                            className="p-1.5 text-domu-warning/70 hover:bg-domu-warning/10 hover:text-domu-warning rounded-lg transition-colors disabled:opacity-40"
+                                                            className="p-1.5 text-brand-warning/70 hover:bg-brand-warning/10 hover:text-brand-warning rounded-lg transition-colors disabled:opacity-40"
                                                             title={t('cancel')}
                                                         >
                                                             <X size={15} />
@@ -347,7 +347,7 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
                                                     <button
                                                         onClick={() => handleRevertPayment(booking)}
                                                         disabled={isLoading}
-                                                        className="p-1.5 text-domu-warning/70 hover:bg-domu-warning/10 hover:text-domu-warning rounded-lg transition-colors disabled:opacity-40"
+                                                        className="p-1.5 text-brand-warning/70 hover:bg-brand-warning/10 hover:text-brand-warning rounded-lg transition-colors disabled:opacity-40"
                                                         title={tBooking('revertPayment')}
                                                     >
                                                         <Undo2 size={15} />
@@ -357,7 +357,7 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
                                                     <button
                                                         onClick={() => handleCancel(booking)}
                                                         disabled={isLoading}
-                                                        className="p-1.5 text-domu-danger/70 hover:bg-domu-danger/10 hover:text-domu-danger rounded-lg transition-colors disabled:opacity-40"
+                                                        className="p-1.5 text-brand-danger/70 hover:bg-brand-danger/10 hover:text-brand-danger rounded-lg transition-colors disabled:opacity-40"
                                                         title={t('cancel')}
                                                     >
                                                         <X size={15} />
@@ -367,7 +367,7 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
                                                     <button
                                                         onClick={() => handleDelete(booking)}
                                                         disabled={isLoading}
-                                                        className="p-1.5 text-domu-danger/70 hover:bg-domu-danger/10 hover:text-domu-danger rounded-lg transition-colors disabled:opacity-40"
+                                                        className="p-1.5 text-brand-danger/70 hover:bg-brand-danger/10 hover:text-brand-danger rounded-lg transition-colors disabled:opacity-40"
                                                         title={t('delete')}
                                                     >
                                                         <Trash2 size={15} />

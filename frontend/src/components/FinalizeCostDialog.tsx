@@ -56,7 +56,7 @@ export default function FinalizeCostDialog({ cost, propertyId, isOpen, onClose }
 
                 <form action={formAction} className="p-6 space-y-4">
                     {state?.error && (
-                        <div className="bg-domu-danger/10 border border-domu-danger/20 text-domu-danger/90 p-3 rounded-lg text-sm">{state.error}</div>
+                        <div className="bg-brand-danger/10 border border-brand-danger/20 text-brand-danger/90 p-3 rounded-lg text-sm">{state.error}</div>
                     )}
 
                     <p className="text-sm text-white/50">{tProp("finalizeHint")}</p>
@@ -71,7 +71,7 @@ export default function FinalizeCostDialog({ cost, propertyId, isOpen, onClose }
                             required
                             defaultValue={defaultDateStr}
                             min={minStr}
-                            className="w-full px-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all text-sm"
+                            className="w-full px-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-brand-primary/60 focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all text-sm"
                         />
                     </div>
 
@@ -86,7 +86,7 @@ export default function FinalizeCostDialog({ cost, propertyId, isOpen, onClose }
                         <button
                             type="submit"
                             disabled={isPending}
-                            className="px-4 py-2 bg-domu-warning hover:bg-domu-warning/80 text-white rounded-lg disabled:opacity-60 flex items-center text-sm font-medium transition-colors"
+                            className="px-4 py-2 bg-brand-warning hover:bg-brand-warning/80 text-white rounded-lg disabled:opacity-60 flex items-center text-sm font-medium transition-colors"
                         >
                             {isPending ? <Loader2 className="animate-spin mr-2" size={15} /> : null}
                             {tProp("finalizeConfirm")}

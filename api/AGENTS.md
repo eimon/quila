@@ -232,7 +232,7 @@ app.include_router(nuevo_router.router)
 |------|---------|
 | `UserRole` | `admin`, `manager`, `owner` |
 | `BookingStatus` | `CONFIRMED`, `TENTATIVE`, `CANCELLED` |
-| `BookingSource` | `AIRBNB`, `BOOKING`, `DOMU`, `MANUAL` |
+| `BookingSource` | `AIRBNB`, `BOOKING`, `DIRECT`, `MANUAL` |
 | `DocumentType` | `DU`, `EXTRANJERO` |
 | `CostCategory` | `RECURRING_MONTHLY`, `PER_DAY_RESERVATION`, `PER_RESERVATION` |
 | `CostCalculationType` | `FIXED_AMOUNT`, `PERCENTAGE` |
@@ -277,8 +277,8 @@ app.include_router(nuevo_router.router)
 ## Tests
 
 - **Framework:** pytest + pytest-asyncio, httpx AsyncClient con ASGITransport
-- **DB real:** PostgreSQL `domu_test_db` (creada por `deploy/init-test-db.sql`)
-- **Ejecución:** `docker exec domu_api pytest tests/ -v`
+- **DB real:** PostgreSQL `quila_test_db` (creada por `deploy/init-test-db.sql`)
+- **Ejecución:** `docker exec quila_api pytest tests/ -v`
 - **Estructura:** `tests/conftest.py` (fixtures: client, users, tokens, property), un archivo por dominio
 - **Limpieza:** Cada test limpia todas las tablas vía `autouse` fixture
 

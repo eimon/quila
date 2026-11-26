@@ -45,14 +45,14 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                             key={toast.id}
                             className={`flex items-start gap-3 px-4 py-3 rounded-xl shadow-2xl border text-sm min-w-72 max-w-sm pointer-events-auto animate-in slide-in-from-bottom-2 duration-200 backdrop-blur-xl ${
                                 toast.type === "error"
-                                    ? "bg-domu-base/90 border-domu-danger/30 text-white/85"
-                                    : "bg-domu-base/90 border-domu-success/30 text-white/85"
+                                    ? "bg-brand-base/90 border-brand-danger/30 text-white/85"
+                                    : "bg-brand-base/90 border-brand-success/30 text-white/85"
                             }`}
                         >
                             {toast.type === "error" ? (
-                                <AlertCircle size={16} className="text-domu-danger mt-0.5 shrink-0" />
+                                <AlertCircle size={16} className="text-brand-danger mt-0.5 shrink-0" />
                             ) : (
-                                <CheckCircle size={16} className="text-domu-success mt-0.5 shrink-0" />
+                                <CheckCircle size={16} className="text-brand-success mt-0.5 shrink-0" />
                             )}
                             <span className="flex-1">{toast.message}</span>
                             <button

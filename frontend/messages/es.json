@@ -265,7 +265,7 @@
         "BookingSource": {
             "AIRBNB": "Airbnb",
             "BOOKING": "Booking.com",
-            "DOMU": "Domu",
+            "DIRECT": "Directa",
             "MANUAL": "Manual"
         },
         "DocumentType": {
