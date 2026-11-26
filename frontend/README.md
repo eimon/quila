@@ -86,26 +86,19 @@ Ambos contextos están registrados en el layout raíz y disponibles en cualquier
 - **CRUD completo**: creación, edición y eliminación con validaciones de negocio.
 - **Autocompletado de dirección**: `AddressAutocomplete` con Nominatim (OpenStreetMap) + miniatura de mapa.
 - **Detalle tabulado** con tres pestañas:
-  - **Detalles y Costos** — información general y tabla de costos.
+  - **Detalles** — información general y precio base.
   - **Calendario** — vista mensual interactiva.
   - **Reportes** — resumen financiero.
 
-### 4. Costos y Precios Dinámicos
+### 4. Precios Dinámicos
 
-- **Categorías de costo**: `RECURRING_MONTHLY`, `PER_DAY_RESERVATION`, `PER_RESERVATION`; cada una con tipo `FIXED_AMOUNT` o `PERCENTAGE`.
-- **Versionado temporal de costos**: cada costo tiene historial con `start_date`/`end_date`. Acciones disponibles:
-  - Modificar valor con fecha de vigencia (`ModifyCostDialog`)
-  - Ver historial de versiones (`PriceHistoryDialog`)
-  - Revertir al valor anterior
-  - **Finalizar costo** (`FinalizeCostDialog`) — cierra la versión activa con una `end_date`
-- **`base_price` con historial**: mismo patrón de versionado aplicado al precio base (`BasePriceCard`).
-- **Reglas de precio**: períodos con rentabilidad % personalizada, visualizados en el calendario.
-- **CostsTable**: vista de tabla en desktop y tarjetas en mobile con menú de acciones.
+- **`base_price` con historial** (`BasePriceCard`): modificar con fecha de vigencia, ver historial (`PriceHistoryDialog`) y revertir.
+- **Reglas de precio**: períodos (`start_date`–`end_date`, ambos inclusive) con un ajuste `PERCENTAGE` (porcentaje sobre el precio base, mayor a -100) o `FIXED_PRICE` (precio por noche fijo, mayor a 0) y una `priority`. Pueden superponerse: gana la de mayor prioridad y, si empatan, la más reciente. Se editan desde la tabla de reglas o creándolas desde una selección de fechas en el calendario (`PricingAdjustmentFields` es el formulario compartido).
 
 ### 5. Calendario Interactivo
 
 - Vista mensual de disponibilidad y precios calculados diariamente.
-- Refleja automáticamente reglas de precio activas y costos vigentes en cada fecha.
+- Muestra el precio de cada noche según la regla ganadora y su nombre.
 
 ### 6. Huéspedes
 
@@ -127,7 +120,7 @@ Ambos contextos están registrados en el layout raíz y disponibles en cualquier
 
 ### 8. Reportes Financieros
 
-- Resumen mensual de ingresos, ocupación y rentabilidad con desglose de costos.
+- Resumen mensual de ingresos (total, cobrados y pendientes) y ocupación.
 - Selector de período con navegación fluida por meses.
 
 ### 9. Gestión de Usuarios
@@ -146,8 +139,8 @@ Definidos en `src/types/api.ts`, espejo de los enums del backend:
 | `BookingSource` | `AIRBNB`, `BOOKING`, `DIRECT`, `MANUAL` |
 | `DocumentType` | `DU`, `EXTRANJERO` |
 | `UserRole` | `ADMIN`, `MANAGER`, `OWNER` |
-| `CostCategory` | `RECURRING_MONTHLY`, `PER_DAY_RESERVATION`, `PER_RESERVATION` |
-| `CostCalculationType` | `FIXED_AMOUNT`, `PERCENTAGE` |
+| `PaymentMethod` | `CASH`, `TRANSFER`, `CARD`, `OTHER` |
+| `PricingAdjustmentType` | `PERCENTAGE`, `FIXED_PRICE` |
 
 ---
 

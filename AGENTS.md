@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Quila is a vacation rental management platform (sistema de gestión de alquiler turístico) built with FastAPI. It manages properties, bookings, dynamic pricing, and costs for administrators, managers, and property owners. The project is in Spanish (domain terms, error messages, some endpoint paths like `/auth/perfil`).
+Quila is a vacation rental management platform (sistema de gestión de alquiler turístico) built with FastAPI. It manages properties, bookings, and dynamic pricing for administrators, managers, and property owners. The project is in Spanish (domain terms, error messages, some endpoint paths like `/auth/perfil`).
 
 ## Development Commands
 
@@ -53,9 +53,10 @@ api/
 
 ## Key Domain Concepts
 
-- **Pricing model:** Property `base_price` is the gross price per night at 100% profitability. Floor price is calculated from costs. Profitability percentage scales between floor (0%) and base price (100%). PricingRules apply date-range overrides with priority-based resolution and overlap validation.
+- **Pricing model:** the nightly price for a date starts from the base price (the versioned `PropertyBasePrice` active on that date, else `Property.base_price`). PricingRules cover inclusive date ranges and may overlap; the winning rule for a date is the one with the highest `priority`, ties going to the most recently created. A `PERCENTAGE` rule yields `base * (1 + value/100)` (value > -100); a `FIXED_PRICE` rule yields `value` (> 0). Totals sum the nights in `[check_in, check_out)` and round to 2 decimals. Rules are fetched once per range and resolved in memory.
+- **Booking totals are snapshots:** `Booking.total_amount` is quoted at creation (creation fails if the quote fails) and never changes when rules change, so rules can be edited over any booking, PAID included.
 - **Bookings** use iCal UIDs, date-only fields (no time component), and validate against date conflicts. Sources: AIRBNB, BOOKING, DIRECT, MANUAL.
-- **Costs** are categorized as RECURRING_MONTHLY, PER_DAY_RESERVATION, or PER_RESERVATION, each either FIXED_AMOUNT or PERCENTAGE.
+- **Financial summary** is revenue-only: monthly total / paid / pending income (booking amounts prorated by nights in the month) and occupancy. There is no costs module.
 
 ## Conventions
 

@@ -6,7 +6,7 @@ Este archivo complementa el CLAUDE.md raíz. Contiene las convenciones exactas d
 
 ## Estructura de Capas
 
-Cada dominio (property, booking, guest, cost, pricing) sigue exactamente estas 5 capas:
+Cada dominio (property, booking, guest, pricing, base_price) sigue exactamente estas 5 capas:
 
 ```
 models/{domain}.py          → SQLAlchemy ORM model
@@ -169,7 +169,7 @@ class DomainService:
 
 - Recibe `AsyncSession` en `__init__`, instancia el Repository
 - Lanza `NotFoundException` cuando el repo retorna `None`
-- Validaciones de negocio van aquí (conflictos de fechas, overlap, etc.)
+- Validaciones de negocio van aquí (conflictos de fechas de reservas, validaciones sobre valores combinados en updates parciales, etc.)
 - Usar excepciones de `exceptions/general.py`:
   - `NotFoundException` (404)
   - `ForbiddenException` (403)
@@ -231,11 +231,20 @@ app.include_router(nuevo_router.router)
 | Enum | Valores |
 |------|---------|
 | `UserRole` | `admin`, `manager`, `owner` |
-| `BookingStatus` | `CONFIRMED`, `TENTATIVE`, `CANCELLED` |
+| `BookingStatus` | `CONFIRMED`, `TENTATIVE`, `CANCELLED`, `PAID` |
 | `BookingSource` | `AIRBNB`, `BOOKING`, `DIRECT`, `MANUAL` |
 | `DocumentType` | `DU`, `EXTRANJERO` |
-| `CostCategory` | `RECURRING_MONTHLY`, `PER_DAY_RESERVATION`, `PER_RESERVATION` |
-| `CostCalculationType` | `FIXED_AMOUNT`, `PERCENTAGE` |
+| `PaymentMethod` | `CASH`, `TRANSFER`, `CARD`, `OTHER` |
+| `PricingAdjustmentType` | `PERCENTAGE`, `FIXED_PRICE` |
+
+## Precios (services/pricing_service.py)
+
+- Precio por noche de la fecha `d`: base = `PropertyBasePrice` vigente en `d`, o `Property.base_price`.
+- Regla ganadora: entre las reglas que cubren `d` (fechas inclusive), la de mayor `priority`; empate → la más reciente (`created_at`, luego `id`). Las reglas pueden superponerse.
+- `PERCENTAGE` → `base * (1 + value/100)` (value > -100); `FIXED_PRICE` → `value` (> 0); sin regla → base.
+- Reglas y precios base se traen una sola vez por rango (`PricingRuleRepository.get_overlapping`, ya ordenado por precedencia) y se resuelven en memoria: nada de una query por noche. Lo usan la cotización, el calendario y el resumen financiero.
+- `Booking.total_amount` es un snapshot tomado al crear la reserva; si la cotización falla, la creación falla. Cambiar reglas no modifica reservas existentes (tampoco las PAID).
+- El resumen financiero es solo de ingresos (`total_income`, `paid_income`, `pending_income`, ocupación).
 
 ## Permisos (core/roles.py)
 
