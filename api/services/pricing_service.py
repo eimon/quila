@@ -133,6 +133,10 @@ class PricingService:
         if not prop:
             raise NotFoundException("Propiedad no encontrada")
 
+        return await self.quote_property(prop, check_in, check_out)
+
+    async def quote_property(self, prop, check_in: date, check_out: date) -> Decimal:
+        """Total for an already-loaded property (avoids re-fetching it per candidate)."""
         nights = await self._nightly_prices(prop, check_in, check_out)
         return round(sum((n["price"] for n in nights), Decimal(0)), 2)
 

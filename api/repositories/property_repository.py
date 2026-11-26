@@ -1,8 +1,16 @@
+from datetime import date
+
+from sqlalchemy import and_, exists
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from core.enums import BookingStatus
+from models.booking import Booking
 from models.property import Property
 from schemas.property import PropertyCreate, PropertyUpdate
 import uuid
+
+# Statuses that occupy dates (same set as BookingRepository.check_conflicts)
+BLOCKING_STATUSES = (BookingStatus.CONFIRMED, BookingStatus.TENTATIVE, BookingStatus.PAID)
 
 
 class PropertyRepository:
@@ -28,6 +36,29 @@ class PropertyRepository:
         """All active properties ordered by name (public catalog)."""
         result = await self.db.execute(
             select(Property).where(Property.is_active == True).order_by(Property.name, Property.id)
+        )
+        return list(result.scalars().all())
+
+    async def get_available(self, check_in: date, check_out: date, guests: int) -> list[Property]:
+        """Active properties with known capacity >= guests and no blocking booking
+        overlapping [check_in, check_out). One query; ordered by name."""
+        conflicting = exists().where(
+            and_(
+                Booking.property_id == Property.id,
+                Booking.status.in_(BLOCKING_STATUSES),
+                Booking.check_in < check_out,
+                Booking.check_out > check_in,
+            )
+        )
+        result = await self.db.execute(
+            select(Property)
+            .where(
+                Property.is_active == True,
+                Property.max_guests.is_not(None),
+                Property.max_guests >= guests,
+                ~conflicting,
+            )
+            .order_by(Property.name, Property.id)
         )
         return list(result.scalars().all())
 
