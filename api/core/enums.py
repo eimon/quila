@@ -26,6 +26,7 @@ class BookingSource(str, enum.Enum):
     BOOKING = "BOOKING"
     DIRECT = "DIRECT"
     MANUAL = "MANUAL"
+    CHATBOT = "CHATBOT"  # hold created by the chatbot (TENTATIVE + expires_at)
 
 
 class DocumentType(str, enum.Enum):

@@ -11,6 +11,16 @@ from core.config import settings
 import uuid
 
 
+def generate_ical_uid(booking_id: uuid.UUID) -> str:
+    """Generate iCal UID in format: {booking_id}@{domain}"""
+    domain = getattr(settings, 'DOMAIN', 'example.com')
+    return f"{booking_id}@{domain}"
+
+
+# Leaving TENTATIVE for one of these converts a chatbot hold: it no longer expires
+CONVERTED_STATUSES = (BookingStatus.CONFIRMED, BookingStatus.PAID)
+
+
 class BookingService:
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -28,10 +38,7 @@ class BookingService:
             raise ForbiddenException("No tienes permiso para acceder a esta reserva")
 
     def _generate_ical_uid(self, booking_id: uuid.UUID) -> str:
-        """Generate iCal UID in format: {booking_id}@quila.{domain}"""
-        # Extract domain from API_V1_STR or use default
-        domain = getattr(settings, 'DOMAIN', 'example.com')
-        return f"{booking_id}@{domain}"
+        return generate_ical_uid(booking_id)
 
     async def create_booking(self, booking_create: BookingCreate) -> Booking:
         """Create a new booking with validation."""
@@ -39,7 +46,8 @@ class BookingService:
         if booking_create.check_in >= booking_create.check_out:
             raise BadRequestException("La fecha de check-in debe ser anterior a la de check-out")
 
-        # Check for conflicts
+        # Expired chatbot holds must not block, then check for conflicts
+        await self.booking_repo.expire_stale_holds()
         conflicts = await self.booking_repo.check_conflicts(
             property_id=booking_create.property_id,
             check_in=booking_create.check_in,
@@ -96,6 +104,8 @@ class BookingService:
 
     async def update_booking(self, booking_id: uuid.UUID, booking_update: BookingUpdate, current_user: UserModel) -> Booking:
         """Update a booking with conflict validation."""
+        # Expired chatbot holds must not block the conflict check below
+        await self.booking_repo.expire_stale_holds()
         # Get existing booking (access check included)
         existing = await self.get_booking(booking_id, current_user)
 
@@ -128,19 +138,27 @@ class BookingService:
                     existing.property_id, check_in, check_out
                 )
 
+        if booking_update.status in CONVERTED_STATUSES:
+            existing.expires_at = None
+
         booking = await self.booking_repo.update(booking_id, booking_update)
         if not booking:
             raise NotFoundException("Reserva no encontrada")
         return booking
 
     async def accept_booking(self, booking_id: uuid.UUID, current_user: UserModel) -> Booking:
-        """Accept a TENTATIVE booking, changing its status to CONFIRMED."""
+        """Accept a TENTATIVE booking, changing its status to CONFIRMED.
+
+        Accepting a chatbot hold clears its expiry; an already expired hold cannot be accepted.
+        """
+        await self.booking_repo.expire_stale_holds()
         booking = await self.booking_repo.get_by_id(booking_id)
         if not booking:
             raise NotFoundException("Reserva no encontrada")
         await self._check_booking_access(booking, current_user)
         if booking.status != BookingStatus.TENTATIVE:
             raise BadRequestException("Solo se pueden aceptar reservas en estado Tentativo")
+        booking.expires_at = None
         from schemas.booking import BookingUpdate
         updated = await self.booking_repo.update(booking_id, BookingUpdate(status=BookingStatus.CONFIRMED))
         return updated
@@ -166,6 +184,7 @@ class BookingService:
             raise BadRequestException("Solo se pueden marcar como pagadas reservas Confirmadas o Tentativas")
 
         booking.status = BookingStatus.PAID
+        booking.expires_at = None  # paying a hold converts it
         booking.paid_at = pay_in.paid_at
         booking.payment_method = pay_in.payment_method
         if pay_in.paid_amount is not None:

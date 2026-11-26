@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, or_, update, func
 from models.booking import Booking
 from models.property import Property as PropertyModel
 from schemas.booking import BookingCreate, BookingUpdate
@@ -13,8 +13,8 @@ class BookingRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def create(self, booking_create: BookingCreate, ical_uid: str, total_amount=None) -> Booking:
-        """Create a booking with auto-generated ical_uid."""
+    async def create(self, booking_create: BookingCreate, ical_uid: str, total_amount=None, **extra) -> Booking:
+        """Create a booking with auto-generated ical_uid. `extra` sets hold/lead columns."""
         db_booking = Booking(
             ical_uid=ical_uid,
             property_id=booking_create.property_id,
@@ -26,6 +26,7 @@ class BookingRepository:
             status=booking_create.status,
             source=booking_create.source,
             total_amount=total_amount,
+            **extra,
         )
         self.db.add(db_booking)
         await self.db.flush()
@@ -66,6 +67,24 @@ class BookingRepository:
             .limit(limit)
         )
         return list(result.scalars().all())
+
+    async def expire_stale_holds(self) -> int:
+        """Lazy hold expiry: cancel every TENTATIVE booking whose expires_at has passed.
+
+        Bookings without expires_at are never touched. Runs in the caller's transaction.
+        Returns the number of expired holds.
+        """
+        result = await self.db.execute(
+            update(Booking)
+            .where(
+                Booking.status == BookingStatus.TENTATIVE,
+                Booking.expires_at.is_not(None),
+                Booking.expires_at < func.now(),
+            )
+            .values(status=BookingStatus.CANCELLED)
+            .execution_options(synchronize_session="fetch")
+        )
+        return result.rowcount or 0
 
     async def check_conflicts(
         self,

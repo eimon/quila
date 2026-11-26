@@ -17,6 +17,7 @@ export enum BookingSource {
     BOOKING = "BOOKING",
     DIRECT = "DIRECT",
     MANUAL = "MANUAL",
+    CHATBOT = "CHATBOT", // hold pre-reserved by the chatbot
 }
 
 export enum DocumentType {
@@ -113,7 +114,7 @@ export interface Booking {
     id: string; // uuid
     ical_uid?: string;
     property_id: string; // uuid
-    guest_id: string; // uuid
+    guest_id?: string | null; // uuid; null on chatbot holds
     check_in: string; // date YYYY-MM-DD
     check_out: string; // date YYYY-MM-DD
     summary: string;
@@ -124,6 +125,12 @@ export interface Booking {
     paid_amount?: number | null;   // Actual amount received (set when paid)
     paid_at?: string | null; // date YYYY-MM-DD
     payment_method?: string | PaymentMethod | null;
+    // Chatbot hold: TENTATIVE until expires_at, then CANCELLED lazily ("Vencido")
+    expires_at?: string | null; // datetime
+    guests?: number | null;
+    lead_name?: string | null;
+    lead_phone?: string | null;
+    lead_email?: string | null;
     external_id?: string;
     ical_url?: string;
     last_synced_at?: string; // datetime

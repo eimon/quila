@@ -19,6 +19,8 @@ class Settings(BaseSettings):
 
     # Chatbot integration (/bot/*). Empty key = bot endpoints disabled.
     BOT_API_KEY: str = ""
+    # Lifetime of a chatbot hold (TENTATIVE booking) before it expires lazily
+    HOLD_TTL_HOURS: int = 24
 
     class Config:
         case_sensitive = True

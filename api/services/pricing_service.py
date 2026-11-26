@@ -149,6 +149,7 @@ class PricingService:
         if not prop:
             raise NotFoundException("Propiedad no encontrada")
 
+        await self.booking_repo.expire_stale_holds()
         bookings = await self.booking_repo.check_conflicts(property_id, start_date, end_date)
         nights = await self._nightly_prices(prop, start_date, end_date + timedelta(days=1))
 

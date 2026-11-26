@@ -1,8 +1,8 @@
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
-from typing import Literal
+from typing import Literal, Optional
 
-from pydantic import BaseModel, Field, UUID4
+from pydantic import BaseModel, EmailStr, Field, UUID4
 
 from core.enums import BotFailureReason
 
@@ -36,6 +36,13 @@ class BotQuoteRequest(BotStayRequest):
     property_id: UUID4
 
 
+class BotHoldRequest(BotQuoteRequest):
+    lead_name: str = Field(..., min_length=1, max_length=255)
+    lead_phone: str = Field(..., min_length=3, max_length=50)
+    lead_email: Optional[EmailStr] = Field(None, max_length=255)
+    notes: Optional[str] = Field(None, max_length=2000)
+
+
 # ---------- Responses ----------
 
 class BotAvailabilityOption(BaseModel):
@@ -59,3 +66,15 @@ class BotQuoteResponse(BaseModel):
     nights: int
     total_amount: Decimal
     available: bool
+
+
+class BotHoldResponse(BaseModel):
+    ok: Literal[True] = True
+    hold_id: UUID4
+    property_id: UUID4
+    name: str
+    check_in: date
+    check_out: date
+    nights: int
+    total_amount: Decimal
+    expires_at: datetime

@@ -11,6 +11,7 @@ services:
       ALGORITHM: ${ALGORITHM:-HS256}
       DATABASE_URL: postgresql+asyncpg://postgres:${POSTGRES_PASSWORD:-password}@db:5432/quila_db
       BOT_API_KEY: ${BOT_API_KEY:-}
+      HOLD_TTL_HOURS: ${HOLD_TTL_HOURS:-24}
     depends_on:
       db:
         condition: service_healthy

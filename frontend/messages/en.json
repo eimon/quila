@@ -51,7 +51,16 @@
         "estimatedTotal": "Estimated total",
         "payTotal": "Pay total:",
         "revertPayment": "Revert payment",
-        "confirmRevertPayment": "This will remove the payment and return the booking to Confirmed. Continue?"
+        "confirmRevertPayment": "This will remove the payment and return the booking to Confirmed. Continue?",
+        "expiresAt": "Expires {date}",
+        "expired": "Expired",
+        "holdExpiry": "Expiry",
+        "guestsCount": "Guests",
+        "leadInfo": "Chatbot contact",
+        "leadName": "Name",
+        "leadPhone": "Phone",
+        "leadEmail": "Email",
+        "lead": "Lead"
     },
     "Common": {
         "save": "Save",
@@ -239,7 +248,8 @@
             "AIRBNB": "Airbnb",
             "BOOKING": "Booking.com",
             "DIRECT": "Direct",
-            "MANUAL": "Manual"
+            "MANUAL": "Manual",
+            "CHATBOT": "Chatbot"
         },
         "DocumentType": {
             "DU": "DNI/DU",

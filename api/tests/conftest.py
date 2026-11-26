@@ -44,6 +44,13 @@ async def override_get_db():
 async def setup_database():
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        # Same double-booking guard as migration 001 (not expressible in the ORM model)
+        await conn.execute(text("CREATE EXTENSION IF NOT EXISTS btree_gist"))
+        await conn.execute(text(
+            "ALTER TABLE bookings ADD CONSTRAINT excl_bookings_no_overlap "
+            "EXCLUDE USING gist (property_id WITH =, daterange(check_in, check_out) WITH &&) "
+            "WHERE (status != 'CANCELLED')"
+        ))
     yield
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)

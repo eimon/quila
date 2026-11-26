@@ -51,7 +51,7 @@ The client sells cabin stays through a chatbot that answers and pre-reserves, an
 - [x] T1 Catalog fields on Property (model, migration 012, schemas, panel forms) and public catalog export. Route: delegated. Evidence: pytest 87 passed / 5 known failures (new `test_public_catalog.py` + catalog field tests in `test_properties.py`); `tsc --noEmit` clean; lint 0 errors (3 pre-existing warnings); `npm run build` ok.
 - [x] T2 Bot auth dependency (`BOT_API_KEY`) and `/bot` router skeleton with the structured-outcome convention. Route: delegated. Evidence: pytest 95 passed / 5 known failures (`test_bot_auth.py`: valid key, missing key, wrong keys, user JWT, env unset -> 503).
 - [x] T3 Availability + quote bot endpoints with lazy hold expiry in the repository. Test-first. Route: delegated. Evidence: RED 16 failed in `test_bot_availability.py` (404, endpoints missing); GREEN full suite 111 passed / 5 known failures. Deviation: lazy expiry needs `Booking.expires_at`, which arrives with migration 013, so the expiry method, its call sites and the expired-hold availability test moved to T4 (migration 013 stays a single revision).
-- [ ] T4 Holds: booking fields (`expires_at`, `guests`, `lead_name`, `lead_phone`, `lead_email`), `BookingSource.CHATBOT`, `HOLD_TTL_HOURS`, migration 013, `POST /bot/holds`, accept clears expiry; panel shows lead data and expiry. Test-first. Route: delegated.
+- [x] T4 Holds: booking fields (`expires_at`, `guests`, `lead_name`, `lead_phone`, `lead_email`), `BookingSource.CHATBOT`, `HOLD_TTL_HOURS`, migration 013, `POST /bot/holds`, accept clears expiry; panel shows lead data and expiry. Test-first. Route: delegated. Also carries the lazy expiry moved from T3 (`BookingRepository.expire_stale_holds`, called by bot availability/quote/hold, booking create/update/accept and the calendar). Evidence: RED 22 failed in `test_bot_holds.py`; GREEN full suite 133 passed / 5 known failures; migrations on a fresh DB: upgrade head -> downgrade -1 x2 -> upgrade head ok (`013 (head)`, CHATBOT in `bookingsource`); `tsc --noEmit` clean, lint 0 errors (3 pre-existing warnings), `npm run build` ok. Decisions: hold insert runs in a SAVEPOINT so an EXCLUDE violation returns `unavailable` without poisoning the request transaction (test DB now gets the same EXCLUDE constraint in `conftest.py`); accept sweeps first so an expired hold cannot be accepted; pay and a PUT to CONFIRMED/PAID also clear `expires_at`; the panel also shows an unswept TENTATIVE hold past its expiry as "Vencido".
 - [ ] T5 Docs (`AGENTS.md`, `api/API_ENDPOINTS.md`, `.env.example`) including the tool JSON Schemas to register in chatv2. Route: delegated.
 
 ## Acceptance criteria
@@ -72,6 +72,7 @@ The client sells cabin stays through a chatbot that answers and pre-reserves, an
 - Branch `feat/bot-contract` created from master `0147ca1`.
 - T1 committed `76005f4`.
 - T2 committed `cbb6b4c`.
+- T3 committed `2548aa4`.
 
 ## Next step
 

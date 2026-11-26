@@ -14,6 +14,8 @@ from schemas.bot import (
     BotAvailabilityResponse,
     BotFailure,
     BotHealthResponse,
+    BotHoldRequest,
+    BotHoldResponse,
     BotQuoteRequest,
     BotQuoteResponse,
 )
@@ -38,3 +40,9 @@ async def search_availability(req: BotAvailabilityRequest, db: AsyncSession = De
 async def quote(req: BotQuoteRequest, db: AsyncSession = Depends(get_db)):
     """Quote one cabin for a stay and say whether the dates are free."""
     return await BotService(db).quote(req)
+
+
+@router.post("/holds", response_model=BotHoldResponse | BotFailure)
+async def create_hold(req: BotHoldRequest, db: AsyncSession = Depends(get_db)):
+    """Pre-reserve a cabin for a lead; a human confirms it from the panel before it expires."""
+    return await BotService(db).create_hold(req)
