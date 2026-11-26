@@ -44,7 +44,9 @@ The product (Quila) is a white-label booking system for a single cabin business,
   - GREEN: pytest -> 5 failed, 75 passed (only the 5 documented pre-existing failures).
   - Migrations on a fresh DB: `alembic upgrade head` -> 011; `downgrade -1` twice -> 009; `upgrade head` -> 011. Data round trip of 011 checked by hand (PERCENTAGE -20 -> profitability 80, single-day rule widened to 2 days on downgrade; back up -> PERCENTAGE 0, priority 0).
   - Decisions: rule dates are inclusive and `end_date >= start_date` (DB check relaxed from `>`); validation in `PricingRuleCreate` (422) and, for partial updates, in the service on the merged values (400); explicit nulls in an update mean "unchanged". Calendar no longer returns `floor_price` / `profitability_percent`. `BookingRepository.exists_paid_booking_overlap` removed (no callers left).
-- [ ] T4 Frontend: remove cost UI, update pricing rule dialogs/table/calendar, revenue-only report, types and messages. Route: delegated.
+- [x] T4 Frontend: remove cost UI, update pricing rule dialogs/table/calendar, revenue-only report, types and messages. Route: delegated.
+  - Evidence: `npx tsc --noEmit` -> exit 0, no errors. `npm run lint` -> ESLint cannot load `eslint-config-next/core-web-vitals` (config resolution error, `eslint.config.mjs` untouched; environmental). Backend pytest unchanged: 5 failed (documented), 75 passed. `rg -il "cost|floor_price|avg_stay|profitability" frontend/src frontend/messages` -> no hits.
+  - Cost components/actions and the property "Costs" section removed; `avg_stay_days` removed from property forms. New `PricingAdjustmentFields` (type select, value, priority, live estimated price) is shared by the add/edit dialogs and the calendar inline rule form; the rules table shows adjustment and priority. `FinancialReport` and the home dashboard show total / paid / pending income instead of costs and profit.
 - [ ] T5 Docs: `AGENTS.md`, `api/AGENTS.md`, `api/API_ENDPOINTS.md`, `frontend/AGENTS.md`. Route: delegated.
 
 ## Acceptance criteria
@@ -64,6 +66,7 @@ The product (Quila) is a white-label booking system for a single cabin business,
 - Branch `feat/dynamic-pricing` created from master `4395eae`.
 - T1 committed: `83a534a`.
 - T2 committed: `276f26d`.
+- T3 committed: `17a7114`.
 
 ## Next step
 

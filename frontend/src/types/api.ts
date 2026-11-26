@@ -30,30 +30,9 @@ export enum UserRole {
     OWNER = "owner",
 }
 
-export enum CostCategory {
-    RECURRING_MONTHLY = "RECURRING_MONTHLY",
-    PER_DAY_RESERVATION = "PER_DAY_RESERVATION",
-    PER_RESERVATION = "PER_RESERVATION",
-}
-
-export enum CostCalculationType {
-    FIXED_AMOUNT = "FIXED_AMOUNT",
-    PERCENTAGE = "PERCENTAGE",
-}
-
-export interface Cost {
-    id: string; // uuid
-    property_id: string; // uuid
-    name: string;
-    category: string | CostCategory;
-    calculation_type: string | CostCalculationType;
-    value: number;
-    is_active: boolean;
-    start_date?: string | null; // YYYY-MM-DD, null = "from the beginning"
-    end_date?: string | null;   // YYYY-MM-DD, null = currently active
-    root_cost_id?: string | null; // uuid, null = this is the root version
-    created_at?: string;
-    updated_at?: string;
+export enum PricingAdjustmentType {
+    PERCENTAGE = "PERCENTAGE",   // base price * (1 + value / 100)
+    FIXED_PRICE = "FIXED_PRICE", // value replaces the nightly price
 }
 
 export interface PricingRule {
@@ -62,7 +41,9 @@ export interface PricingRule {
     name: string;
     start_date: string; // YYYY-MM-DD
     end_date: string; // YYYY-MM-DD
-    profitability_percent: number;
+    adjustment_type: string | PricingAdjustmentType;
+    adjustment_value: number; // > -100 for PERCENTAGE, > 0 for FIXED_PRICE
+    priority: number;         // highest wins when rules overlap; tie -> most recent
     created_at?: string;
     updated_at?: string;
 }
@@ -71,9 +52,7 @@ export interface CalendarDay {
     date: string; // YYYY-MM-DD
     price: number;
     status: "AVAILABLE" | "RESERVED";
-    rule_name?: string;
-    floor_price: number;
-    profitability_percent: number;
+    rule_name?: string | null;
 }
 
 export interface FinancialSummary {
@@ -83,16 +62,9 @@ export interface FinancialSummary {
     occupied_days: number;
     occupancy_rate: number;
     total_bookings: number;
-    total_income: number;
-    costs: {
-        fixed_monthly: number;
-        fixed_daily: number;
-        variable_per_reservation: number;
-        commissions: number;
-        total: number;
-    };
-    net_profit: number;
-    profit_margin_percent: number;
+    total_income: number;   // paid_income + pending_income
+    paid_income: number;    // PAID bookings
+    pending_income: number; // CONFIRMED / TENTATIVE bookings
 }
 
 export interface User {
@@ -112,8 +84,7 @@ export interface Property {
     description?: string;
     manager_id: string; // uuid
     owner_id?: string; // uuid
-    base_price: number; // NEW: Precio bruto por noche
-    avg_stay_days: number; // NEW: Días promedio de estadía
+    base_price: number; // Precio bruto por noche
     latitude?: number | null;
     longitude?: number | null;
     created_at: string; // datetime

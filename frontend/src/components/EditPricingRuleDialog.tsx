@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { PricingRule } from "@/types/api";
+import { useEffect } from "react";
+import { PricingRule, PricingAdjustmentType } from "@/types/api";
 import { updatePricingRule, PricingRuleFormState } from "@/actions/pricing";
 import { X, Loader2 } from "lucide-react";
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
-import { formatPrice } from "@/lib/utils";
+import PricingAdjustmentFields from "./PricingAdjustmentFields";
 
 interface EditPricingRuleDialogProps {
     rule: PricingRule;
@@ -19,7 +19,6 @@ const inputCls = "w-full px-3 py-2 rounded-lg bg-white/[0.06] border border-whit
 const labelCls = "block text-xs font-medium text-white/55 mb-1.5 uppercase tracking-wider";
 
 export default function EditPricingRuleDialog({ rule, propertyId, basePrice, onClose }: EditPricingRuleDialogProps) {
-    const [profitability, setProfitability] = useState(Number(rule.profitability_percent));
     const initialState: PricingRuleFormState = { error: "", success: false };
     const t = useTranslations("Common");
     const tProp = useTranslations("Properties");
@@ -32,9 +31,6 @@ export default function EditPricingRuleDialog({ rule, propertyId, basePrice, onC
             onClose();
         }
     }, [state.success, onClose]);
-
-    const sliderValue = Math.min(Math.max(profitability, 0), 100);
-    const estimatedPrice = formatPrice(basePrice * profitability / 100);
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
@@ -92,43 +88,15 @@ export default function EditPricingRuleDialog({ rule, propertyId, basePrice, onC
                         </div>
                     </div>
 
-                    <div>
-                        <div className="flex items-center justify-between mb-1.5">
-                            <label htmlFor="edit_rule_profitability_percent" className={labelCls}>
-                                {t('profitabilityPercent')}
-                            </label>
-                            <span className="text-xs font-semibold text-brand-primary/80">
-                                {tProp('estimatedPrice', { price: estimatedPrice })}
-                            </span>
-                        </div>
-                        <input
-                            id="edit_rule_profitability_percent"
-                            name="profitability_percent"
-                            type="number"
-                            step="0.1"
-                            min="0"
-                            required
-                            value={profitability}
-                            onChange={(e) => setProfitability(parseFloat(e.target.value) || 0)}
-                            className={`${inputCls} mb-3`}
-                        />
-                        <input
-                            type="range"
-                            min={0}
-                            max={100}
-                            step={1}
-                            value={sliderValue}
-                            onChange={(e) => setProfitability(parseFloat(e.target.value))}
-                            className="w-full h-2 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-brand-primary [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-brand-primary [&::-moz-range-thumb]:border-0"
-                            style={{
-                                background: `linear-gradient(to right, #818cf8 0%, #818cf8 ${sliderValue}%, rgba(255,255,255,0.10) ${sliderValue}%, rgba(255,255,255,0.10) 100%)`
-                            }}
-                        />
-                        <div className="flex justify-between text-xs text-white/25 mt-1">
-                            <span>{tProp('pricingFloorLabel')}</span>
-                            <span>{tProp('pricingBaseLabel', { price: formatPrice(basePrice) })}</span>
-                        </div>
-                    </div>
+                    <PricingAdjustmentFields
+                        idPrefix="edit_rule"
+                        basePrice={basePrice}
+                        defaultType={rule.adjustment_type as PricingAdjustmentType}
+                        defaultValue={Number(rule.adjustment_value)}
+                        defaultPriority={rule.priority}
+                        inputClassName={inputCls}
+                        labelClassName={labelCls}
+                    />
 
                     <div className="pt-2 flex justify-end space-x-3">
                         <button

@@ -62,7 +62,6 @@
         "confirmDelete": "Are you sure you want to delete this?",
         "back": "Back",
         "name": "Name",
-        "category": "Category",
         "type": "Type",
         "value": "Value",
         "add": "Add",
@@ -77,11 +76,9 @@
         "actions": "Actions",
         "anonymous": "Anonymous",
         "selectProperty": "Select property...",
-        "noCosts": "No costs added yet.",
         "dateFrom": "Start Date",
         "dateTo": "End Date",
         "endDate": "Until",
-        "profitabilityPercent": "Profitability %",
         "optional": "Optional",
         "confirm": "Confirm",
         "select": "Select",
@@ -96,53 +93,36 @@
         "myManaged": "My Managed Properties",
         "addNew": "Add New Property",
         "details": "Property Details",
-        "costs": "Costs & Fees",
         "calendar": "Availability & Pricing",
         "rules": "Pricing Rules",
         "noProperties": "No properties found",
         "tabs": {
-            "details": "Details & Costs",
+            "details": "Details",
             "calendar": "Calendar",
             "reports": "Reports"
         },
-        "modifyCost": "Modify cost",
         "modifyBasePrice": "Modify",
         "currentValue": "Current value",
         "newValue": "New value",
         "applyChange": "Apply change",
         "modifyDateHint": "The previous value will remain active until the day before this date.",
         "basePriceLabel": "Base Price",
-        "basePriceDescription": "Gross price per night used as the ceiling for profitability calculations.",
-        "revertCost": "Revert to previous value",
+        "basePriceDescription": "Gross price per night. Pricing rules adjust it by a percentage or replace it with a fixed price.",
         "revertBasePrice": "Revert",
         "confirmRevert": "This will undo the last change and restore the previous value. Continue?",
-        "finalizeCost": "Set last billing date",
-        "finalizeHint": "Select the last day this cost will be charged. After this date it will no longer be active.",
-        "finalizeEndDate": "Last billing date",
-        "finalizeConfirm": "Finalize",
-        "finalized": "Finalized",
-        "upcoming": "Upcoming",
-        "showAllCosts": "Show all costs",
-        "costsDescription": "Manage recurring and fixed costs for this property.",
         "calendarDescription": "View bookings and daily prices on the calendar",
         "rulesDescription": "Manage seasonal and special pricing periods",
         "noRules": "No pricing rules added yet.",
         "rulePeriod": "Period",
-        "ruleProfitability": "Profitability",
-        "estimatedPrice": "≈ {price} / night",
-        "pricingFloorLabel": "0% (floor)",
-        "pricingBaseLabel": "100% (base: {price})",
         "create": {
             "title": "Add New Property",
             "name": "Property Name",
             "address": "Address",
             "description": "Description",
             "basePrice": "Base Price",
-            "avgStay": "Avg Stay Days",
             "submit": "Create Property",
             "subtitle": "Enter the details of the property you want to manage.",
-            "basePriceHint": "Gross price guests pay at 100% profitability",
-            "avgStayHint": "For cost calculations"
+            "basePriceHint": "Gross price per night guests pay when no pricing rule applies"
         }
     },
     "Calendar": {
@@ -155,11 +135,7 @@
         "selectedRange": "{start} → {end}",
         "ruleName": "Rule name",
         "ruleNamePlaceholder": "E.g. High season",
-        "profitabilityPercent": "Profitability %",
-        "profitabilityHint": "100 = base price, 120 = +20%",
-        "saveRule": "Save rule",
-        "pricePerNight": "{price} / night",
-        "basePriceScale": "100% = {price}"
+        "saveRule": "Save rule"
     },
     "Auth": {
         "loginTitle": "Welcome back",
@@ -177,7 +153,6 @@
         "subtitle": "Here is a summary for {month}",
         "totalProperties": "Properties",
         "monthlyIncome": "Monthly Income",
-        "netProfit": "Net Profit",
         "avgOccupancy": "Avg. Occupancy",
         "propertySummary": "Your properties",
         "noProperties": "You have no managed properties yet.",
@@ -188,26 +163,23 @@
         "nights": "nights",
         "occupancy": "Occupancy",
         "income": "Income",
-        "profit": "Profit",
-        "checkIn": "Check-in"
+        "checkIn": "Check-in",
+        "pendingIncome": "Pending income",
+        "pending": "Pending"
     },
     "Reports": {
         "title": "Financial Report",
         "noData": "No financial data available for this period.",
         "summary": "Summary",
         "income": "Total Income",
-        "costs": "Total Costs",
-        "margin": "Profit Margin",
         "occupancy": "Occupancy Rate",
         "occupiedDays": "Occupied Days",
         "totalBookings": "Total Bookings",
-        "netProfit": "Net Profit",
-        "fixedMonthly": "Fixed Monthly Costs",
-        "fixedDaily": "Per Day (Reservation)",
-        "variableCosts": "Variable Costs (Reservation)",
-        "commissions": "Commissions",
-        "breakdown": "Cost Breakdown",
-        "details": "View your property's financial performance overview."
+        "details": "View your property's financial performance overview.",
+        "paidIncome": "Paid Income",
+        "paidIncomeDetail": "Bookings marked as paid",
+        "pendingIncome": "Pending Income",
+        "pendingIncomeDetail": "Confirmed or tentative bookings not yet paid"
     },
     "Profile": {
         "title": "My Profile",
@@ -241,15 +213,6 @@
         "passwordHint": "Leave blank to keep current password"
     },
     "Enums": {
-        "CostCategory": {
-            "RECURRING_MONTHLY": "Recurring Monthly",
-            "PER_DAY_RESERVATION": "Per Day (Reservation)",
-            "PER_RESERVATION": "Per Reservation"
-        },
-        "CostCalculationType": {
-            "FIXED_AMOUNT": "Fixed Amount",
-            "PERCENTAGE": "Percentage"
-        },
         "BookingStatus": {
             "CONFIRMED": "Confirmed",
             "TENTATIVE": "Tentative",
@@ -276,6 +239,22 @@
             "admin": "Admin",
             "manager": "Manager",
             "owner": "Owner"
+        },
+        "PricingAdjustmentType": {
+            "PERCENTAGE": "Percentage",
+            "FIXED_PRICE": "Fixed price"
         }
+    },
+    "PricingRules": {
+        "adjustment": "Adjustment",
+        "adjustmentType": "Adjustment type",
+        "priority": "Priority",
+        "priorityHint": "When rules overlap, the highest priority wins; on a tie, the most recent rule.",
+        "percentageValue": "Adjustment %",
+        "fixedPriceValue": "Price per night",
+        "percentageHint": "Over the base price ({price}): 30 = +30%, -10 = -10%",
+        "fixedPriceHint": "Replaces the base price for every night in the period",
+        "estimatedPrice": "≈ {price} / night",
+        "fixedPriceDisplay": "{price} fixed"
     }
 }

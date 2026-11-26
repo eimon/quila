@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { PricingRule } from "@/types/api";
+import { PricingRule, PricingAdjustmentType } from "@/types/api";
+import { formatPrice } from "@/lib/utils";
 import { Pencil, Trash2 } from "lucide-react";
 import { deletePricingRule } from "@/actions/pricing";
 import AddPricingRuleDialog from "./AddPricingRuleDialog";
@@ -21,12 +22,21 @@ export default function PricingRulesTable({ rules, propertyId, basePrice }: Pric
     const [editingRule, setEditingRule] = useState<PricingRule | null>(null);
     const t = useTranslations("Properties");
     const tCommon = useTranslations("Common");
+    const tRules = useTranslations("PricingRules");
     const { showError } = useToast();
     const { confirm } = useConfirm();
 
     const formatDate = (dateStr: string) => {
         const [year, month, day] = dateStr.split('-');
         return `${year}-${month}-${day}`;
+    };
+
+    const formatAdjustment = (rule: PricingRule) => {
+        const value = Number(rule.adjustment_value);
+        if (rule.adjustment_type === PricingAdjustmentType.FIXED_PRICE) {
+            return tRules('fixedPriceDisplay', { price: formatPrice(value) });
+        }
+        return `${value > 0 ? '+' : ''}${value.toFixed(value % 1 === 0 ? 0 : 2)}%`;
     };
 
     const handleDelete = async (rule: PricingRule) => {
@@ -66,7 +76,10 @@ export default function PricingRulesTable({ rules, propertyId, basePrice }: Pric
                                         {t('rulePeriod')}
                                     </th>
                                     <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-white/35 uppercase tracking-wider">
-                                        {t('ruleProfitability')}
+                                        {tRules('adjustment')}
+                                    </th>
+                                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-white/35 uppercase tracking-wider">
+                                        {tRules('priority')}
                                     </th>
                                     <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-white/35 uppercase tracking-wider">
                                         {tCommon('actions')}
@@ -83,7 +96,10 @@ export default function PricingRulesTable({ rules, propertyId, basePrice }: Pric
                                             {formatDate(rule.start_date)} — {formatDate(rule.end_date)}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-white/80 text-right font-mono">
-                                            {Number(rule.profitability_percent).toFixed(1)}%
+                                            {formatAdjustment(rule)}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-white/60 text-right font-mono">
+                                            {rule.priority}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
                                             <div className="flex items-center justify-end space-x-1">

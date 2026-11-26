@@ -23,7 +23,6 @@ const propertySchema = z.object({
     address: z.string().min(1, "Address is required"),
     description: z.string().optional(),
     base_price: z.coerce.number().min(1, "Base price must be greater than 0"),
-    avg_stay_days: z.coerce.number().int().min(1, "Average stay must be at least 1 day"),
     latitude: z.preprocess(
         val => (!val || val === "") ? undefined : parseFloat(val as string),
         z.number().optional()
@@ -45,7 +44,6 @@ export async function createProperty(prevState: PropertyFormState, formData: For
         address: formData.get("address"),
         description: formData.get("description"),
         base_price: formData.get("base_price"),
-        avg_stay_days: formData.get("avg_stay_days"),
         latitude: formData.get("latitude"),
         longitude: formData.get("longitude"),
     });
@@ -92,7 +90,6 @@ export async function updateProperty(
         address: formData.get("address"),
         description: formData.get("description"),
         base_price: formData.get("base_price"),
-        avg_stay_days: formData.get("avg_stay_days"),
         latitude: formData.get("latitude"),
         longitude: formData.get("longitude"),
     });
