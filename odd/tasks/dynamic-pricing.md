@@ -36,7 +36,9 @@ The product (Quila) is a white-label booking system for a single cabin business,
 
 - [x] T1 Test baseline: add the SQLAlchemy asyncio extra (`greenlet`) to `api/requirements.txt` so the test image imports. Route: delegated (same writer as T2-T5).
   - Evidence: `requirements.txt` now pins `sqlalchemy[asyncio]`; `docker compose -p quila run --rm --no-deps web python -m pytest -q` -> 6 failed, 65 passed (exactly the 6 documented pre-existing failures).
-- [ ] T2 Remove costs module (backend + migration 010 + revenue-only financial summary). Route: delegated — writer trigger (2+ non-trivial files).
+- [x] T2 Remove costs module (backend + migration 010 + revenue-only financial summary). Route: delegated — writer trigger (2+ non-trivial files).
+  - Evidence: pytest -> 5 failed, 53 passed (only the 5 documented pre-existing failures; `test_costs.py` removed). Entrypoint `alembic upgrade head` reached `010` on a DB at `009`; `property_costs`, `costcategory`, `costcalculationtype` and `properties.avg_stay_days` gone.
+  - Financial summary now returns `total_income`, `paid_income`, `pending_income` (+ occupancy). Income per booking = `paid_amount` if recorded, else the `total_amount` snapshot, prorated by nights inside the month; bookings without a stored total fall back to current nightly prices. Nights are counted up to the first day of the next month (the previous code dropped the month's last night).
 - [ ] T3 New pricing rule model + formula + migration 011; batch rule lookup (no N+1); booking creation fails loudly if the quote fails instead of storing a null total; drop the "no rule changes over PAID bookings" and "no overlap" restrictions. Test-first. Route: delegated.
 - [ ] T4 Frontend: remove cost UI, update pricing rule dialogs/table/calendar, revenue-only report, types and messages. Route: delegated.
 - [ ] T5 Docs: `AGENTS.md`, `api/AGENTS.md`, `api/API_ENDPOINTS.md`, `frontend/AGENTS.md`. Route: delegated.
@@ -56,6 +58,7 @@ The product (Quila) is a white-label booking system for a single cabin business,
 ## Progress
 
 - Branch `feat/dynamic-pricing` created from master `4395eae`.
+- T1 committed: `83a534a`.
 
 ## Next step
 

@@ -17,7 +17,6 @@ from models.property import Property  # noqa: F401
 from models.booking import Booking  # noqa: F401
 from models.guest import Guest  # noqa: F401
 from models.pricing_rule import PricingRule  # noqa: F401
-from models.property_cost import PropertyCost  # noqa: F401
 from models.property_base_price import PropertyBasePrice  # noqa: F401
 from models.refresh_token import RefreshToken  # noqa: F401
 
@@ -58,7 +57,6 @@ async def clean_tables():
     async with test_engine.begin() as conn:
         await conn.execute(text("DELETE FROM bookings"))
         await conn.execute(text("DELETE FROM pricing_rules"))
-        await conn.execute(text("DELETE FROM property_costs"))
         await conn.execute(text("DELETE FROM property_base_prices"))
         await conn.execute(text("DELETE FROM properties"))
         await conn.execute(text("DELETE FROM guests"))
@@ -146,7 +144,6 @@ async def test_property(client, admin_headers):
             "name": "Test Property",
             "address": "123 Test St",
             "base_price": "100.00",
-            "avg_stay_days": 3,
         },
         headers=admin_headers,
     )

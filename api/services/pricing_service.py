@@ -6,11 +6,9 @@ from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.enums import CostCategory, CostCalculationType
+from core.enums import BookingStatus
 from exceptions.general import BadRequestException, NotFoundException
-from models.property_cost import PropertyCost
 from repositories.booking_repository import BookingRepository
-from repositories.cost_repository import CostRepository
 from repositories.pricing_rule_repository import PricingRuleRepository
 from repositories.property_base_price_repository import PropertyBasePriceRepository
 from repositories.property_repository import PropertyRepository
@@ -22,7 +20,6 @@ class PricingService:
         self.db = db
         self.pricing_repo = PricingRuleRepository(db)
         self.property_repo = PropertyRepository(db)
-        self.cost_repo = CostRepository(db)
         self.base_price_repo = PropertyBasePriceRepository(db)
         self.booking_repo = BookingRepository(db)
 
@@ -78,17 +75,8 @@ class PricingService:
         return await self.pricing_repo.get_by_property(property_id)
 
     # ------------------------------------------------------------------ #
-    # Cost calculation helpers                                             #
+    # Price helpers                                                        #
     # ------------------------------------------------------------------ #
-
-    @staticmethod
-    def _costs_for_date(all_costs: list[PropertyCost], ref_date: date) -> list[PropertyCost]:
-        """Filters a pre-fetched cost list to only those active on ref_date."""
-        return [
-            c for c in all_costs
-            if (c.start_date is None or c.start_date <= ref_date)
-            and (c.end_date is None or c.end_date >= ref_date)
-        ]
 
     @staticmethod
     def _base_price_for_date(records, ref_date: date) -> Optional[Decimal]:
@@ -99,24 +87,25 @@ class PricingService:
                 return r.value
         return None
 
-    def _calculate_floor_price(self, costs: list[PropertyCost], avg_stay: int) -> Decimal:
-        """
-        Calculate the 'zero profit' floor price per day from a pre-filtered cost list.
-        Formula:
-          (Monthly Fixed / 30) + (Per Day Reservation) + (Per Reservation Fixed / avg_stay)
-        Percentage costs are treated as markups applied separately.
-        """
-        floor = Decimal(0)
-        for cost in costs:
-            if cost.calculation_type == CostCalculationType.FIXED_AMOUNT:
-                if cost.category == CostCategory.RECURRING_MONTHLY:
-                    floor += cost.value / Decimal(30)
-                elif cost.category == CostCategory.PER_DAY_RESERVATION:
-                    floor += cost.value
-                elif cost.category == CostCategory.PER_RESERVATION:
-                    if avg_stay > 0:
-                        floor += cost.value / Decimal(avg_stay)
-        return floor
+    async def _nightly_prices(self, prop, start_date: date, end_date: date) -> list[dict]:
+        """Price of each night in [start_date, end_date) with the rule that produced it."""
+        all_base_prices = await self.base_price_repo.get_overlapping(prop.id, start_date, end_date)
+
+        nights = []
+        current = start_date
+        while current < end_date:
+            rules = await self.pricing_repo.get_active_rules_for_date(prop.id, current)
+            active_rule = rules[0] if rules else None
+            percent = active_rule.profitability_percent if active_rule else Decimal(100)
+
+            day_base_price = self._base_price_for_date(all_base_prices, current) or prop.base_price
+            nights.append({
+                "date": current,
+                "price": day_base_price * (percent / Decimal(100)),
+                "rule": active_rule,
+            })
+            current += timedelta(days=1)
+        return nights
 
     # ------------------------------------------------------------------ #
     # Price quote                                                          #
@@ -130,25 +119,8 @@ class PricingService:
         if not prop:
             raise NotFoundException("Propiedad no encontrada")
 
-        all_costs = await self.cost_repo.get_costs_overlapping(property_id, check_in, check_out)
-        all_base_prices = await self.base_price_repo.get_overlapping(property_id, check_in, check_out)
-
-        total = Decimal(0)
-        current = check_in
-        while current < check_out:
-            day_costs = self._costs_for_date(all_costs, current)
-            floor_price = self._calculate_floor_price(day_costs, prop.avg_stay_days)
-
-            rules = await self.pricing_repo.get_active_rules_for_date(property_id, current)
-            active_rule = rules[0] if rules else None
-            percent = active_rule.profitability_percent if active_rule else Decimal(100)
-
-            day_base_price = self._base_price_for_date(all_base_prices, current) or prop.base_price
-            price = floor_price + (day_base_price - floor_price) * (percent / Decimal(100))
-            total += price
-            current += timedelta(days=1)
-
-        return round(total, 2)
+        nights = await self._nightly_prices(prop, check_in, check_out)
+        return round(sum((n["price"] for n in nights), Decimal(0)), 2)
 
     # ------------------------------------------------------------------ #
     # Calendar                                                             #
@@ -159,41 +131,25 @@ class PricingService:
         if not prop:
             raise NotFoundException("Propiedad no encontrada")
 
-        # Fetch all cost versions and base price versions overlapping the calendar range once
-        all_costs = await self.cost_repo.get_costs_overlapping(property_id, start_date, end_date)
-        all_base_prices = await self.base_price_repo.get_overlapping(property_id, start_date, end_date)
-
         bookings = await self.booking_repo.check_conflicts(property_id, start_date, end_date)
+        nights = await self._nightly_prices(prop, start_date, end_date + timedelta(days=1))
 
         result = []
-        current = start_date
-        while current <= end_date:
-            day_costs = self._costs_for_date(all_costs, current)
-            floor_price = self._calculate_floor_price(day_costs, prop.avg_stay_days)
-
-            rules = await self.pricing_repo.get_active_rules_for_date(property_id, current)
-            active_rule = rules[0] if rules else None
-            percent = active_rule.profitability_percent if active_rule else Decimal(100)
-
-            day_base_price = self._base_price_for_date(all_base_prices, current) or prop.base_price
-            margin = day_base_price - floor_price
-            price = floor_price + (margin * (percent / Decimal(100)))
-
+        for night in nights:
+            current = night["date"]
             status = "AVAILABLE"
             for b in bookings:
                 if b.check_in <= current < b.check_out:
                     status = "RESERVED"
                     break
 
+            rule = night["rule"]
             result.append({
                 "date": current,
-                "price": round(price, 2),
+                "price": round(night["price"], 2),
                 "status": status,
-                "rule_name": active_rule.name if active_rule else None,
-                "floor_price": round(floor_price, 2),
-                "profitability_percent": percent,
+                "rule_name": rule.name if rule else None,
             })
-            current += timedelta(days=1)
 
         return result
 
@@ -202,99 +158,51 @@ class PricingService:
     # ------------------------------------------------------------------ #
 
     async def get_financial_summary(self, property_id: uuid.UUID, year: int, month: int):
-        """Calculate monthly financial performance using temporally accurate cost values."""
+        """Monthly revenue: booking income attributed to the nights that fall in the month.
+
+        Each booking's amount (paid_amount when recorded, else its total_amount snapshot)
+        is prorated by the share of its nights inside the month. Bookings without a stored
+        total fall back to the current nightly prices.
+        """
         prop = await self.property_repo.get_by_id(property_id)
         if not prop:
             raise NotFoundException("Propiedad no encontrada")
 
         days_in_month = calendar.monthrange(year, month)[1]
-        start_date = date(year, month, 1)
-        end_date = date(year, month, days_in_month)
-
-        # Fetch all cost versions and base price versions overlapping the month once
-        all_costs = await self.cost_repo.get_costs_overlapping(property_id, start_date, end_date)
-        all_base_prices = await self.base_price_repo.get_overlapping(property_id, start_date, end_date)
+        month_start = date(year, month, 1)
+        month_end = month_start + timedelta(days=days_in_month)  # exclusive
 
         bookings = await self.booking_repo.get_by_property(property_id, 0, 1000)
         month_bookings = [
             b for b in bookings
-            if b.check_in < end_date and b.check_out > start_date and b.status != "CANCELLED"
+            if b.check_in < month_end and b.check_out > month_start
+            and b.status != BookingStatus.CANCELLED
         ]
 
-        # Monthly fixed costs: use value at the 1st of the month
-        start_of_month_costs = self._costs_for_date(all_costs, start_date)
-        total_fixed_monthly = Decimal(0)
-        for cost in start_of_month_costs:
-            if (
-                cost.calculation_type == CostCalculationType.FIXED_AMOUNT
-                and cost.category == CostCategory.RECURRING_MONTHLY
-            ):
-                total_fixed_monthly += cost.value
-
-        total_income = Decimal(0)
-        total_fixed_daily = Decimal(0)
-        total_variable_per_reservation = Decimal(0)
-        total_commission_amount = Decimal(0)
+        paid_income = Decimal(0)
+        pending_income = Decimal(0)
         occupied_days = 0
 
         for booking in month_bookings:
-            booking_start = max(booking.check_in, start_date)
-            booking_end = min(booking.check_out, end_date)
-            days = (booking_end - booking_start).days
+            nights_start = max(booking.check_in, month_start)
+            nights_end = min(booking.check_out, month_end)
+            nights_in_month = (nights_end - nights_start).days
+            total_nights = (booking.check_out - booking.check_in).days
+            occupied_days += nights_in_month
 
-            # Per-reservation and commission costs use value at check-in
-            checkin_costs = self._costs_for_date(all_costs, booking.check_in)
-            for cost in checkin_costs:
-                if (
-                    cost.calculation_type == CostCalculationType.FIXED_AMOUNT
-                    and cost.category == CostCategory.PER_RESERVATION
-                ):
-                    total_variable_per_reservation += cost.value
+            amount = booking.paid_amount if booking.paid_amount is not None else booking.total_amount
+            if amount is not None:
+                income = amount * Decimal(nights_in_month) / Decimal(total_nights)
+            else:
+                nights = await self._nightly_prices(prop, nights_start, nights_end)
+                income = sum((n["price"] for n in nights), Decimal(0))
 
-            # Income and daily costs per occupied day
-            # If PAID and paid_amount is recorded, use it as the actual income
-            use_paid_amount = booking.paid_amount is not None
-            booking_income = booking.paid_amount if use_paid_amount else Decimal(0)
+            if booking.status == BookingStatus.PAID:
+                paid_income += income
+            else:
+                pending_income += income
 
-            for day_offset in range(days):
-                day = booking_start + timedelta(days=day_offset)
-                occupied_days += 1
-
-                day_costs = self._costs_for_date(all_costs, day)
-
-                if not use_paid_amount:
-                    floor_price = self._calculate_floor_price(day_costs, prop.avg_stay_days)
-
-                    rules = await self.pricing_repo.get_active_rules_for_date(property_id, day)
-                    active_rule = rules[0] if rules else None
-                    percent = active_rule.profitability_percent if active_rule else Decimal(100)
-
-                    day_base_price = self._base_price_for_date(all_base_prices, day) or prop.base_price
-                    price = floor_price + (day_base_price - floor_price) * (percent / Decimal(100))
-                    booking_income += price
-
-                for cost in day_costs:
-                    if (
-                        cost.calculation_type == CostCalculationType.FIXED_AMOUNT
-                        and cost.category == CostCategory.PER_DAY_RESERVATION
-                    ):
-                        total_fixed_daily += cost.value
-
-            total_income += booking_income
-
-            # Commissions on this booking's income using check-in rates
-            for cost in checkin_costs:
-                if cost.calculation_type == CostCalculationType.PERCENTAGE:
-                    total_commission_amount += booking_income * (cost.value / Decimal(100))
-
-        total_costs = (
-            total_fixed_monthly
-            + total_fixed_daily
-            + total_variable_per_reservation
-            + total_commission_amount
-        )
-
-        net_profit = total_income - total_costs
+        total_income = paid_income + pending_income
         occupancy_rate = (occupied_days / days_in_month) * 100 if days_in_month > 0 else 0
 
         return {
@@ -305,15 +213,6 @@ class PricingService:
             "occupancy_rate": round(occupancy_rate, 2),
             "total_bookings": len(month_bookings),
             "total_income": round(total_income, 2),
-            "costs": {
-                "fixed_monthly": round(total_fixed_monthly, 2),
-                "fixed_daily": round(total_fixed_daily, 2),
-                "variable_per_reservation": round(total_variable_per_reservation, 2),
-                "commissions": round(total_commission_amount, 2),
-                "total": round(total_costs, 2),
-            },
-            "net_profit": round(net_profit, 2),
-            "profit_margin_percent": round(
-                (net_profit / total_income * 100) if total_income > 0 else 0, 2
-            ),
+            "paid_income": round(paid_income, 2),
+            "pending_income": round(pending_income, 2),
         }

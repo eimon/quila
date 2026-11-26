@@ -11,7 +11,6 @@ async def test_create_property_admin(client, admin_headers):
         "name": "Beach House",
         "address": "Av. Costanera 100",
         "base_price": "200.00",
-        "avg_stay_days": 4,
     }, headers=admin_headers)
     assert resp.status_code == 201
     data = resp.json()

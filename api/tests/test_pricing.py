@@ -118,7 +118,7 @@ async def test_pricing_calendar(client, admin_headers, test_property):
 
 # ---------- Financial summary ----------
 
-async def test_financial_summary(client, admin_headers, test_property):
+async def test_financial_summary_empty_month(client, admin_headers, test_property):
     pid = test_property["id"]
 
     resp = await client.get(
@@ -128,6 +128,49 @@ async def test_financial_summary(client, admin_headers, test_property):
     )
     assert resp.status_code == 200
     data = resp.json()
-    assert "total_income" in data
-    assert "costs" in data
-    assert "net_profit" in data
+    assert data["total_income"] == 0
+    assert data["paid_income"] == 0
+    assert data["pending_income"] == 0
+    assert data["occupied_days"] == 0
+    for removed in ("costs", "net_profit", "profit_margin_percent"):
+        assert removed not in data
+
+
+async def test_financial_summary_revenue_split_and_proration(client, admin_headers, test_property):
+    """Paid vs pending income; a booking crossing the month end is prorated by nights."""
+    pid = test_property["id"]  # base_price 100
+
+    paid = await client.post(
+        "/bookings/",
+        json={"property_id": pid, "check_in": "2026-06-01", "check_out": "2026-06-03", "summary": "Paid"},
+        headers=admin_headers,
+    )
+    assert paid.status_code == 201
+    resp = await client.post(
+        f"/bookings/{paid.json()['id']}/pay",
+        json={"paid_at": "2026-05-20", "payment_method": "CASH", "paid_amount": "150.00"},
+        headers=admin_headers,
+    )
+    assert resp.status_code == 200
+
+    # 4 nights (Jun 28 - Jul 2), total 400: 3 nights in June -> 300
+    crossing = await client.post(
+        "/bookings/",
+        json={"property_id": pid, "check_in": "2026-06-28", "check_out": "2026-07-02", "summary": "Pending"},
+        headers=admin_headers,
+    )
+    assert crossing.status_code == 201
+    assert crossing.json()["total_amount"] == "400.00"
+
+    resp = await client.get(
+        f"/properties/{pid}/financial-summary",
+        params={"year": 2026, "month": 6},
+        headers=admin_headers,
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["total_bookings"] == 2
+    assert data["occupied_days"] == 5
+    assert data["paid_income"] == 150
+    assert data["pending_income"] == 300
+    assert data["total_income"] == 450
