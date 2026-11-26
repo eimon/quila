@@ -28,9 +28,9 @@ class BookingService:
             raise ForbiddenException("No tienes permiso para acceder a esta reserva")
 
     def _generate_ical_uid(self, booking_id: uuid.UUID) -> str:
-        """Generate iCal UID in format: {booking_id}@domu.{domain}"""
+        """Generate iCal UID in format: {booking_id}@quila.{domain}"""
         # Extract domain from API_V1_STR or use default
-        domain = getattr(settings, 'DOMAIN', 'domu.com')
+        domain = getattr(settings, 'DOMAIN', 'example.com')
         return f"{booking_id}@{domain}"
 
     async def create_booking(self, booking_create: BookingCreate) -> Booking:

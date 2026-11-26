@@ -50,7 +50,7 @@ export default function PropertyActions({ property }: PropertyActionsProps) {
                 <button
                     onClick={handleDelete}
                     disabled={isDeleting}
-                    className="inline-flex items-center px-4 py-2 bg-domu-danger/10 hover:bg-domu-danger/20 text-domu-danger rounded-lg transition-colors text-sm font-medium disabled:opacity-50 border border-domu-danger/20"
+                    className="inline-flex items-center px-4 py-2 bg-brand-danger/10 hover:bg-brand-danger/20 text-brand-danger rounded-lg transition-colors text-sm font-medium disabled:opacity-50 border border-brand-danger/20"
                 >
                     <Trash2 size={14} className="mr-2" />
                     {isDeleting ? t('loading') : t('delete')}

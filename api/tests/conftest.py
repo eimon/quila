@@ -23,7 +23,7 @@ from models.refresh_token import RefreshToken  # noqa: F401
 
 # ---------- Test database ----------
 
-TEST_DATABASE_URL = settings.DATABASE_URL.replace("/domu_db", "/domu_test_db")
+TEST_DATABASE_URL = settings.DATABASE_URL.replace("/quila_db", "/quila_test_db")
 
 test_engine = create_async_engine(TEST_DATABASE_URL, echo=False)
 TestAsyncSession = sessionmaker(test_engine, class_=AsyncSession, expire_on_commit=False)

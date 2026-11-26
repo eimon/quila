@@ -24,7 +24,7 @@ app.include_router(base_price.router)
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to Domu API", "project": settings.PROJECT_NAME}
+    return {"message": "Welcome to Quila API", "project": settings.PROJECT_NAME}
 
 @app.get("/health")
 async def health_check():

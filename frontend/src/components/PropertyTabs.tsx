@@ -43,7 +43,7 @@ function PropertyTabsContent({ activeTab }: PropertyTabsProps) {
                             className={cn(
                                 "whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors",
                                 isActive
-                                    ? "border-domu-primary text-domu-primary"
+                                    ? "border-brand-primary text-brand-primary"
                                     : "border-transparent text-white/40 hover:text-white/65 hover:border-white/[0.20]",
                                 isPending && "opacity-40 cursor-not-allowed"
                             )}

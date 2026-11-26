@@ -14,9 +14,9 @@ interface UsersTableProps {
 }
 
 const roleBadgeClass: Record<string, string> = {
-    [UserRole.ADMIN]:   "bg-domu-danger/12 text-domu-danger",
-    [UserRole.MANAGER]: "bg-domu-primary/12 text-domu-primary",
-    [UserRole.OWNER]:   "bg-domu-success/12 text-domu-success",
+    [UserRole.ADMIN]:   "bg-brand-danger/12 text-brand-danger",
+    [UserRole.MANAGER]: "bg-brand-primary/12 text-brand-primary",
+    [UserRole.OWNER]:   "bg-brand-success/12 text-brand-success",
 };
 
 function UserCardMenu({
@@ -62,8 +62,8 @@ function UserCardMenu({
 
             {open && (
                 <div className="absolute right-0 top-8 z-30 w-40 glass-modal rounded-xl shadow-2xl border border-white/[0.08] overflow-hidden py-1">
-                    {item(t("edit"), onEdit, "text-domu-primary/80")}
-                    {item(t("delete"), onDelete, "text-domu-danger/80", isDeleting)}
+                    {item(t("edit"), onEdit, "text-brand-primary/80")}
+                    {item(t("delete"), onDelete, "text-brand-danger/80", isDeleting)}
                 </div>
             )}
         </div>
@@ -112,7 +112,7 @@ export default function UsersTable({ users }: UsersTableProps) {
                                 </span>
                                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
                                     user.is_active
-                                        ? "bg-domu-success/12 text-domu-success"
+                                        ? "bg-brand-success/12 text-brand-success"
                                         : "bg-white/[0.05] text-white/35"
                                 }`}>
                                     {user.is_active ? tUsers("active") : tUsers("inactive")}
@@ -181,7 +181,7 @@ export default function UsersTable({ users }: UsersTableProps) {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                             user.is_active
-                                                ? "bg-domu-success/12 text-domu-success"
+                                                ? "bg-brand-success/12 text-brand-success"
                                                 : "bg-white/[0.05] text-white/35"
                                         }`}>
                                             {user.is_active ? tUsers("active") : tUsers("inactive")}
@@ -191,7 +191,7 @@ export default function UsersTable({ users }: UsersTableProps) {
                                         <div className="flex items-center justify-end space-x-1">
                                             <button
                                                 onClick={() => setEditingUser(user)}
-                                                className="p-1.5 text-domu-primary/70 hover:bg-domu-primary/10 hover:text-domu-primary rounded-lg transition-colors"
+                                                className="p-1.5 text-brand-primary/70 hover:bg-brand-primary/10 hover:text-brand-primary rounded-lg transition-colors"
                                                 title={t("edit")}
                                             >
                                                 <Pencil size={15} />
@@ -199,7 +199,7 @@ export default function UsersTable({ users }: UsersTableProps) {
                                             <button
                                                 onClick={() => handleDelete(user)}
                                                 disabled={isDeleting === user.id}
-                                                className="p-1.5 text-domu-danger/70 hover:bg-domu-danger/10 hover:text-domu-danger rounded-lg transition-colors disabled:opacity-40"
+                                                className="p-1.5 text-brand-danger/70 hover:bg-brand-danger/10 hover:text-brand-danger rounded-lg transition-colors disabled:opacity-40"
                                                 title={t("delete")}
                                             >
                                                 <Trash2 size={15} />

@@ -55,8 +55,8 @@ function GuestCardMenu({
 
             {open && (
                 <div className="absolute right-0 top-8 z-30 w-40 glass-modal rounded-xl shadow-2xl border border-white/[0.08] overflow-hidden py-1">
-                    {item(t("edit"), onEdit, "text-domu-primary/80")}
-                    {item(t("delete"), onDelete, "text-domu-danger/80", isDeleting)}
+                    {item(t("edit"), onEdit, "text-brand-primary/80")}
+                    {item(t("delete"), onDelete, "text-brand-danger/80", isDeleting)}
                 </div>
             )}
         </div>
@@ -162,7 +162,7 @@ export default function GuestsTable({ guests }: GuestsTableProps) {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
                                         <div className="flex items-center justify-end space-x-1">
                                             <button
-                                                className="p-1.5 text-domu-primary/70 hover:bg-domu-primary/10 hover:text-domu-primary rounded-lg transition-colors"
+                                                className="p-1.5 text-brand-primary/70 hover:bg-brand-primary/10 hover:text-brand-primary rounded-lg transition-colors"
                                                 title={t('edit')}
                                             >
                                                 <Pencil size={15} />
@@ -170,7 +170,7 @@ export default function GuestsTable({ guests }: GuestsTableProps) {
                                             <button
                                                 onClick={() => handleDelete(guest)}
                                                 disabled={isDeleting === guest.id}
-                                                className="p-1.5 text-domu-danger/70 hover:bg-domu-danger/10 hover:text-domu-danger rounded-lg transition-colors disabled:opacity-40"
+                                                className="p-1.5 text-brand-danger/70 hover:bg-brand-danger/10 hover:text-brand-danger rounded-lg transition-colors disabled:opacity-40"
                                                 title={t('delete')}
                                             >
                                                 <Trash2 size={15} />

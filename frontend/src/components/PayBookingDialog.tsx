@@ -45,7 +45,7 @@ export default function PayBookingDialog({ bookingId, totalAmount, isOpen, onClo
 
                 <form action={formAction} className="p-6 space-y-4">
                     {state?.error && (
-                        <div className="bg-domu-danger/10 border border-domu-danger/20 text-domu-danger/90 p-3 rounded-lg text-sm">{state.error}</div>
+                        <div className="bg-brand-danger/10 border border-brand-danger/20 text-brand-danger/90 p-3 rounded-lg text-sm">{state.error}</div>
                     )}
 
                     <div>
@@ -57,7 +57,7 @@ export default function PayBookingDialog({ bookingId, totalAmount, isOpen, onClo
                             type="date"
                             required
                             defaultValue={todayStr}
-                            className="w-full px-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all text-sm"
+                            className="w-full px-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-brand-primary/60 focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all text-sm"
                         />
                     </div>
 
@@ -68,7 +68,7 @@ export default function PayBookingDialog({ bookingId, totalAmount, isOpen, onClo
                         <select
                             name="payment_method"
                             required
-                            className="w-full px-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all text-sm"
+                            className="w-full px-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-brand-primary/60 focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all text-sm"
                         >
                             <option value="">{t("select")}...</option>
                             {(["CASH", "TRANSFER", "CARD", "OTHER"] as const).map((m) => (
@@ -86,7 +86,7 @@ export default function PayBookingDialog({ bookingId, totalAmount, isOpen, onClo
                                 <button
                                     type="button"
                                     onClick={() => setPaidAmount(String(totalAmount))}
-                                    className="text-xs text-domu-primary/70 hover:text-domu-primary transition-colors"
+                                    className="text-xs text-brand-primary/70 hover:text-brand-primary transition-colors"
                                 >
                                     {tBooking("payTotal")} ${Number(totalAmount).toLocaleString("es-AR", { maximumFractionDigits: 0 })}
                                 </button>
@@ -100,7 +100,7 @@ export default function PayBookingDialog({ bookingId, totalAmount, isOpen, onClo
                             value={paidAmount}
                             onChange={(e) => setPaidAmount(e.target.value)}
                             placeholder="0.00"
-                            className="w-full px-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all text-sm"
+                            className="w-full px-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-brand-primary/60 focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all text-sm"
                         />
                     </div>
 

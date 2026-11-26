@@ -24,7 +24,7 @@ class PaymentMethod(str, enum.Enum):
 class BookingSource(str, enum.Enum):
     AIRBNB = "AIRBNB"
     BOOKING = "BOOKING"
-    DOMU = "DOMU"
+    DIRECT = "DIRECT"
     MANUAL = "MANUAL"
 
 

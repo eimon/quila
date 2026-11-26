@@ -69,14 +69,14 @@ export default function PriceHistoryDialog({
                                 {[...history].reverse().map((entry, i) => {
                                     const isCurrent = !entry.end_date;
                                     return (
-                                        <tr key={i} className={isCurrent ? "bg-domu-primary/5" : ""}>
+                                        <tr key={i} className={isCurrent ? "bg-brand-primary/5" : ""}>
                                             <td className={`px-6 py-3 text-sm font-mono ${isCurrent ? "text-white/90 font-semibold" : "text-white/55"}`}>
                                                 {formatValue(entry.value)}
                                             </td>
                                             <td className={`px-6 py-3 text-sm ${isCurrent ? "text-white/75" : "text-white/45"}`}>
                                                 {formatDate(entry.start_date, isMonthly)}
                                             </td>
-                                            <td className={`px-6 py-3 text-sm ${isCurrent ? "text-domu-primary/80 font-medium" : "text-white/45"}`}>
+                                            <td className={`px-6 py-3 text-sm ${isCurrent ? "text-brand-primary/80 font-medium" : "text-white/45"}`}>
                                                 {isCurrent ? tCommon("current") : formatDate(entry.end_date, isMonthly)}
                                             </td>
                                         </tr>

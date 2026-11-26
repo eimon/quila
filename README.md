@@ -1,8 +1,8 @@
-# Domu - Sistema de Gestión de Alquiler Turístico
+# Quila - Sistema de Gestión de Alquiler Turístico
 
 Proyecto creado con Vibecode utilizando patrones de diseño SOLID y Clean Architecture.
 
-Domu es una plataforma integral diseñada para maximizar la rentabilidad de propiedades de alquiler turístico. Centraliza la gestión para administradores y ofrece transparencia total a los propietarios.
+Quila es una plataforma integral diseñada para maximizar la rentabilidad de propiedades de alquiler turístico. Centraliza la gestión para administradores y ofrece transparencia total a los propietarios.
 
 ## 🚀 Visión General
 

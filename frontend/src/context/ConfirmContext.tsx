@@ -48,8 +48,8 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
                     <div className="glass-modal rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
                         <div className="p-6">
                             <div className="flex items-start gap-4">
-                                <div className="p-2 bg-domu-danger/10 rounded-lg shrink-0">
-                                    <AlertTriangle size={18} className="text-domu-danger" />
+                                <div className="p-2 bg-brand-danger/10 rounded-lg shrink-0">
+                                    <AlertTriangle size={18} className="text-brand-danger" />
                                 </div>
                                 <p className="text-sm text-white/70 pt-1">{dialog.message}</p>
                             </div>
@@ -63,7 +63,7 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
                             </button>
                             <button
                                 onClick={handleConfirm}
-                                className="px-4 py-2 bg-domu-danger hover:bg-domu-danger/80 text-white text-sm font-medium rounded-lg transition-colors"
+                                className="px-4 py-2 bg-brand-danger hover:bg-brand-danger/80 text-white text-sm font-medium rounded-lg transition-colors"
                             >
                                 {dialog.confirmLabel ?? t("confirm")}
                             </button>

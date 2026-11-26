@@ -29,8 +29,8 @@ export default async function Navbar() {
                     <div className="flex items-center">
                         <SidebarTrigger />
                         <div className="flex-shrink-0 flex items-center ml-4 lg:ml-0">
-                            <LocalizedLink href="/" className="text-xl font-bold text-domu-primary tracking-tight">
-                                DOMU
+                            <LocalizedLink href="/" className="text-xl font-bold text-brand-primary tracking-tight">
+                                QUILA
                             </LocalizedLink>
                         </div>
                     </div>
@@ -50,7 +50,7 @@ export default async function Navbar() {
 
                                 <div className="relative group">
                                     <button className="flex items-center space-x-2 p-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.10] transition-colors">
-                                        <div className="h-8 w-8 rounded-lg bg-domu-primary/15 flex items-center justify-center text-domu-primary">
+                                        <div className="h-8 w-8 rounded-lg bg-brand-primary/15 flex items-center justify-center text-brand-primary">
                                             <UserIcon size={16} />
                                         </div>
                                         <ChevronDown size={13} className="text-white/40" />
@@ -72,7 +72,7 @@ export default async function Navbar() {
                                         <form action={logout} className="w-full">
                                             <button
                                                 type="submit"
-                                                className="w-full text-left px-4 py-2 text-sm text-domu-danger/75 hover:bg-domu-danger/[0.08] hover:text-domu-danger flex items-center transition-colors"
+                                                className="w-full text-left px-4 py-2 text-sm text-brand-danger/75 hover:bg-brand-danger/[0.08] hover:text-brand-danger flex items-center transition-colors"
                                             >
                                                 <LogOut size={14} className="mr-2" />
                                                 {t('logout')}

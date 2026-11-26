@@ -15,7 +15,7 @@ export enum PaymentMethod {
 export enum BookingSource {
     AIRBNB = "AIRBNB",
     BOOKING = "BOOKING",
-    DOMU = "DOMU",
+    DIRECT = "DIRECT",
     MANUAL = "MANUAL",
 }
 

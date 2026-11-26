@@ -18,7 +18,7 @@ export default async function PropertiesPage() {
 
                 <Link
                     href="/properties/new"
-                    className="inline-flex items-center justify-center px-4 py-2 bg-domu-primary hover:bg-domu-primary/80 text-white rounded-lg font-medium transition-colors text-sm"
+                    className="inline-flex items-center justify-center px-4 py-2 bg-brand-primary hover:bg-brand-primary/80 text-white rounded-lg font-medium transition-colors text-sm"
                 >
                     <Plus size={16} className="mr-2" />
                     {t('addNew')}

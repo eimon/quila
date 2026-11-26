@@ -7,7 +7,7 @@ import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
 
-const inputCls = "w-full px-4 py-2.5 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all text-sm";
+const inputCls = "w-full px-4 py-2.5 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-brand-primary/60 focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all text-sm";
 const labelCls = "block text-xs font-medium text-white/55 mb-1.5 uppercase tracking-wider";
 
 export default function NewPropertyPage() {
@@ -34,7 +34,7 @@ export default function NewPropertyPage() {
             <div className="glass rounded-2xl p-6 md:p-8">
                 <form action={formAction} className="space-y-5">
                     {state?.error && (
-                        <div className="bg-domu-danger/10 border border-domu-danger/20 text-domu-danger/90 p-3 rounded-lg text-sm">
+                        <div className="bg-brand-danger/10 border border-brand-danger/20 text-brand-danger/90 p-3 rounded-lg text-sm">
                             {state.error}
                         </div>
                     )}
@@ -120,7 +120,7 @@ export default function NewPropertyPage() {
                         <button
                             type="submit"
                             disabled={isPending}
-                            className="px-6 py-2 bg-domu-primary hover:bg-domu-primary/80 text-white font-medium rounded-lg transition-colors flex items-center disabled:opacity-60 text-sm"
+                            className="px-6 py-2 bg-brand-primary hover:bg-brand-primary/80 text-white font-medium rounded-lg transition-colors flex items-center disabled:opacity-60 text-sm"
                         >
                             {isPending ? (
                                 <>

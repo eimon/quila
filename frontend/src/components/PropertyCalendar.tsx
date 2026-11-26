@@ -170,11 +170,11 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
         const isConfirmed = selectionEnd !== null;
 
         if (isStart || isEnd) return isConfirmed
-            ? 'bg-domu-primary border-domu-primary text-white'
-            : 'bg-domu-primary/70 border-domu-primary/70 text-white';
+            ? 'bg-brand-primary border-brand-primary text-white'
+            : 'bg-brand-primary/70 border-brand-primary/70 text-white';
         if (inRange) return isConfirmed
-            ? 'bg-domu-primary/12 border-domu-primary/20'
-            : 'bg-domu-primary/8 border-domu-primary/15';
+            ? 'bg-brand-primary/12 border-brand-primary/20'
+            : 'bg-brand-primary/8 border-brand-primary/15';
         return null;
     };
 
@@ -274,11 +274,11 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
 
                     {/* Selection in progress banner */}
                     {selection.selectionStart && !selection.selectionEnd && (
-                        <div className="mt-3 flex items-center justify-between bg-domu-primary/10 border border-domu-primary/20 rounded-lg px-4 py-2 text-sm text-domu-primary/90">
+                        <div className="mt-3 flex items-center justify-between bg-brand-primary/10 border border-brand-primary/20 rounded-lg px-4 py-2 text-sm text-brand-primary/90">
                             <span>{t('selectingFrom', { date: selection.selectionStart })}</span>
                             <button
                                 onClick={() => dispatchSelection({ type: 'RESET_SELECTION' })}
-                                className="ml-2 p-1 hover:bg-domu-primary/15 rounded transition-colors"
+                                className="ml-2 p-1 hover:bg-brand-primary/15 rounded transition-colors"
                                 title={t('cancelSelection')}
                             >
                                 <X size={13} />
@@ -288,7 +288,7 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
 
                     {/* Inline rule creation form — hidden in booking mode */}
                     {selection.selectionStart && selection.selectionEnd && !onRangeSelected && (
-                        <div className="mt-4 border border-domu-primary/20 rounded-xl p-4 bg-domu-primary/5">
+                        <div className="mt-4 border border-brand-primary/20 rounded-xl p-4 bg-brand-primary/5">
                             <div className="flex items-center justify-between mb-3">
                                 <h4 className="text-sm font-semibold text-white/80">{t('newRule')}</h4>
                                 <button
@@ -314,7 +314,7 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
                                         type="text"
                                         name="name"
                                         required
-                                        className="w-full px-3 py-1.5 text-sm rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all"
+                                        className="w-full px-3 py-1.5 text-sm rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-brand-primary/60 focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all"
                                         placeholder={t('ruleNamePlaceholder')}
                                     />
                                 </div>
@@ -328,7 +328,7 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
                                             const floorPrice = data.calendarData.find(d => d.date === selection.selectionStart)?.floor_price ?? 0;
                                             const price = floorPrice + (basePrice - floorPrice) * calendarProfitability / 100;
                                             return (
-                                                <span className="text-xs font-semibold text-domu-primary/80">
+                                                <span className="text-xs font-semibold text-brand-primary/80">
                                                     {t('pricePerNight', { price: formatPrice(price) })}
                                                 </span>
                                             );
@@ -343,7 +343,7 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
                                         min={0}
                                         step={0.1}
                                         required
-                                        className="w-full px-3 py-1.5 text-sm rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all mb-2"
+                                        className="w-full px-3 py-1.5 text-sm rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-brand-primary/60 focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all mb-2"
                                     />
                                     <input
                                         type="range"
@@ -352,7 +352,7 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
                                         step={1}
                                         value={Math.min(Math.max(calendarProfitability, 0), 100)}
                                         onChange={(e) => setCalendarProfitability(parseFloat(e.target.value))}
-                                        className="w-full h-1.5 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-domu-primary [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-3.5 [&::-moz-range-thumb]:h-3.5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-domu-primary [&::-moz-range-thumb]:border-0"
+                                        className="w-full h-1.5 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-brand-primary [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-3.5 [&::-moz-range-thumb]:h-3.5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-brand-primary [&::-moz-range-thumb]:border-0"
                                         style={{
                                             background: `linear-gradient(to right, #818cf8 0%, #818cf8 ${Math.min(Math.max(calendarProfitability, 0), 100)}%, rgba(255,255,255,0.10) ${Math.min(Math.max(calendarProfitability, 0), 100)}%, rgba(255,255,255,0.10) 100%)`
                                         }}
@@ -364,7 +364,7 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
                                 </div>
 
                                 {ruleState.error && (
-                                    <p className="text-xs text-domu-danger/90 bg-domu-danger/10 border border-domu-danger/20 rounded px-3 py-1.5">
+                                    <p className="text-xs text-brand-danger/90 bg-brand-danger/10 border border-brand-danger/20 rounded px-3 py-1.5">
                                         {ruleState.error}
                                     </p>
                                 )}
@@ -380,7 +380,7 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
                                     <button
                                         type="submit"
                                         disabled={isRulePending}
-                                        className="px-4 py-1.5 text-sm bg-domu-primary hover:bg-domu-primary/80 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
+                                        className="px-4 py-1.5 text-sm bg-brand-primary hover:bg-brand-primary/80 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
                                     >
                                         {isRulePending && <Loader2 size={13} className="animate-spin" />}
                                         {t('saveRule')}
@@ -397,11 +397,11 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
                             <span className="text-white/40">{t('available')}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="w-3.5 h-3.5 bg-domu-danger/8 border border-domu-danger/20 rounded"></div>
+                            <div className="w-3.5 h-3.5 bg-brand-danger/8 border border-brand-danger/20 rounded"></div>
                             <span className="text-white/40">{t('reserved')}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="w-3.5 h-3.5 bg-domu-primary border border-domu-primary rounded"></div>
+                            <div className="w-3.5 h-3.5 bg-brand-primary border border-brand-primary rounded"></div>
                             <span className="text-white/40">{t('selected')}</span>
                         </div>
                     </div>

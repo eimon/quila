@@ -17,7 +17,7 @@ class BookingBase(BaseModel):
 class BookingCreate(BookingBase):
     """Create booking. ical_uid will be auto-generated."""
     status: BookingStatus = BookingStatus.CONFIRMED
-    source: BookingSource = BookingSource.DOMU
+    source: BookingSource = BookingSource.DIRECT
 
 
 class BookingUpdate(BaseModel):

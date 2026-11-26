@@ -89,7 +89,7 @@ export default function PricingRulesTable({ rules, propertyId, basePrice }: Pric
                                             <div className="flex items-center justify-end space-x-1">
                                                 <button
                                                     onClick={() => setEditingRule(rule)}
-                                                    className="p-1.5 text-domu-primary/70 hover:bg-domu-primary/10 hover:text-domu-primary rounded-lg transition-colors"
+                                                    className="p-1.5 text-brand-primary/70 hover:bg-brand-primary/10 hover:text-brand-primary rounded-lg transition-colors"
                                                     title={tCommon('edit')}
                                                 >
                                                     <Pencil size={15} />
@@ -97,7 +97,7 @@ export default function PricingRulesTable({ rules, propertyId, basePrice }: Pric
                                                 <button
                                                     onClick={() => handleDelete(rule)}
                                                     disabled={isDeleting === rule.id}
-                                                    className="p-1.5 text-domu-danger/70 hover:bg-domu-danger/10 hover:text-domu-danger rounded-lg transition-colors disabled:opacity-40"
+                                                    className="p-1.5 text-brand-danger/70 hover:bg-brand-danger/10 hover:text-brand-danger rounded-lg transition-colors disabled:opacity-40"
                                                     title={tCommon('delete')}
                                                 >
                                                     <Trash2 size={15} />

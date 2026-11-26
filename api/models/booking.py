@@ -32,7 +32,7 @@ class Booking(Base):
     summary = Column(String, nullable=False)  # SUMMARY
     description = Column(Text, nullable=True)  # DESCRIPTION
     status = Column(Enum(BookingStatus), default=BookingStatus.CONFIRMED, nullable=False)
-    source = Column(Enum(BookingSource), default=BookingSource.DOMU, nullable=False)
+    source = Column(Enum(BookingSource), default=BookingSource.DIRECT, nullable=False)
 
     # Amounts
     total_amount = Column(Numeric(10, 2), nullable=True)  # Calculated at creation time

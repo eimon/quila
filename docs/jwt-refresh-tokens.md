@@ -158,7 +158,7 @@ def parse_allowed_clients(cls, v):
 
 ```yaml
 # docker-compose.yml
-ALLOWED_CLIENTS: '{"domu-app":"secreto1","domu-web":"secreto2"}'
+ALLOWED_CLIENTS: '{"quila-app":"secreto1","quila-web":"secreto2"}'
 ```
 
 La validación vive en una dependencia reutilizable, no inline en el router:
@@ -191,9 +191,9 @@ async def login(
 
 | Clave | Valor | Store |
 |---|---|---|
-| `domu_token` | Access token | SecureStore |
-| `domu_refresh_token` | Refresh token | SecureStore |
-| `domu_user` | JSON del usuario | SecureStore |
+| `quila_token` | Access token | SecureStore |
+| `quila_refresh_token` | Refresh token | SecureStore |
+| `quila_user` | JSON del usuario | SecureStore |
 
 El access token también vive en el estado Zustand para acceso síncrono. El refresh token **solo** vive en SecureStore — no hace falta tenerlo en memoria.
 
@@ -204,8 +204,8 @@ El access token también vive en el estado Zustand para acceso síncrono. El ref
 ```typescript
 // store/authStore.ts
 
-export const TOKEN_KEY = "domu_token";
-export const REFRESH_TOKEN_KEY = "domu_refresh_token";
+export const TOKEN_KEY = "quila_token";
+export const REFRESH_TOKEN_KEY = "quila_refresh_token";
 
 interface AuthState {
   token: string | null;

@@ -1,4 +1,4 @@
-# Domu Frontend — Agent Guide
+# Quila Frontend — Agent Guide
 
 Este archivo es la referencia completa para agentes de código (Claude, Cursor, etc.) trabajando dentro de `frontend/`. Contiene las convenciones de código, arquitectura, features implementadas y guía de desarrollo.
 
@@ -245,11 +245,11 @@ Sistema de diseño oscuro con glassmorphism. Documentado en `DESIGN_SYSTEM.md` y
 **Tokens de color:**
 | Token | Valor | Uso |
 |---|---|---|
-| `domu-primary` | `#818cf8` | Acciones principales, links activos |
-| `domu-success` | `#34d399` | Estados positivos, confirmación |
-| `domu-warning` | `#fbbf24` | Advertencias |
-| `domu-danger` | `#f87171` | Errores, eliminación |
-| `domu-base` | `#0f1117` | Fondo base |
+| `brand-primary` | `#818cf8` | Acciones principales, links activos |
+| `brand-success` | `#34d399` | Estados positivos, confirmación |
+| `brand-warning` | `#fbbf24` | Advertencias |
+| `brand-danger` | `#f87171` | Errores, eliminación |
+| `brand-base` | `#0f1117` | Fondo base |
 
 Todos los modales y diálogos usan `glass-modal rounded-2xl shadow-2xl`.
 
@@ -275,7 +275,7 @@ Definidos en `src/types/api.ts`, espejo de los enums del backend:
 | Enum | Valores |
 |---|---|
 | `BookingStatus` | `CONFIRMED`, `TENTATIVE`, `CANCELLED`, `PAID` |
-| `BookingSource` | `AIRBNB`, `BOOKING`, `DOMU`, `MANUAL` |
+| `BookingSource` | `AIRBNB`, `BOOKING`, `DIRECT`, `MANUAL` |
 | `DocumentType` | `DU`, `EXTRANJERO` |
 | `UserRole` | `ADMIN`, `MANAGER`, `OWNER` |
 | `CostCategory` | `RECURRING_MONTHLY`, `PER_DAY_RESERVATION`, `PER_RESERVATION` |

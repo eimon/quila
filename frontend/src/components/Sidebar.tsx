@@ -38,7 +38,7 @@ export default function Sidebar({ userRole }: { userRole: string | null }) {
             >
                 {/* Logo header */}
                 <div className="flex items-center justify-between h-16 px-5 border-b border-white/[0.07]">
-                    {/* <span className="text-xl font-bold text-domu-primary tracking-tight">DOMU</span> */}
+                    {/* <span className="text-xl font-bold text-brand-primary tracking-tight">QUILA</span> */}
                     <button
                         type="button"
                         className="ml-auto flex-shrink-0 p-1.5 text-white/40 rounded-md hover:text-white/70 hover:bg-white/[0.06] transition-colors lg:hidden"
@@ -56,12 +56,12 @@ export default function Sidebar({ userRole }: { userRole: string | null }) {
                             href="/"
                             onClick={close}
                             className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all ${pathname === "/"
-                                ? "bg-domu-primary/10 text-domu-primary"
+                                ? "bg-brand-primary/10 text-brand-primary"
                                 : "text-white/50 hover:bg-white/[0.05] hover:text-white/80"
                                 }`}
                         >
                             <Home
-                                className={`mr-3 flex-shrink-0 h-5 w-5 transition-colors ${pathname === "/" ? "text-domu-primary" : "text-white/35 group-hover:text-white/60"}`}
+                                className={`mr-3 flex-shrink-0 h-5 w-5 transition-colors ${pathname === "/" ? "text-brand-primary" : "text-white/35 group-hover:text-white/60"}`}
                             />
                             {t('dashboard')}
                         </Link>
@@ -74,12 +74,12 @@ export default function Sidebar({ userRole }: { userRole: string | null }) {
                                     href={item.href}
                                     onClick={close}
                                     className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all ${isActive
-                                        ? "bg-domu-primary/10 text-domu-primary"
+                                        ? "bg-brand-primary/10 text-brand-primary"
                                         : "text-white/50 hover:bg-white/[0.05] hover:text-white/80"
                                         }`}
                                 >
                                     <item.icon
-                                        className={`mr-3 flex-shrink-0 h-5 w-5 transition-colors ${isActive ? "text-domu-primary" : "text-white/35 group-hover:text-white/60"
+                                        className={`mr-3 flex-shrink-0 h-5 w-5 transition-colors ${isActive ? "text-brand-primary" : "text-white/35 group-hover:text-white/60"
                                             }`}
                                     />
                                     {t(item.name as any)}
@@ -93,7 +93,7 @@ export default function Sidebar({ userRole }: { userRole: string | null }) {
                     <form action={logout}>
                         <button
                             type="submit"
-                            className="group flex w-full items-center px-3 py-2.5 text-sm font-medium text-domu-danger/70 rounded-lg hover:bg-domu-danger/[0.08] hover:text-domu-danger transition-all"
+                            className="group flex w-full items-center px-3 py-2.5 text-sm font-medium text-brand-danger/70 rounded-lg hover:bg-brand-danger/[0.08] hover:text-brand-danger transition-all"
                         >
                             <LogOut className="mr-3 flex-shrink-0 h-5 w-5" />
                             {t('logout')}
