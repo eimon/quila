@@ -7,6 +7,7 @@ import { X, Loader2 } from "lucide-react";
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
+import PropertyCatalogFields from "@/components/PropertyCatalogFields";
 
 interface EditPropertyDialogProps {
     property: Property;
@@ -105,6 +106,8 @@ export default function EditPropertyDialog({ property, onClose }: EditPropertyDi
                                 />
                             </div>
                         </div>
+
+                        <PropertyCatalogFields property={property} inputCls={inputCls} labelCls={labelCls} />
                     </div>
 
                     <div className="px-6 py-4 border-t border-white/[0.08] flex justify-end space-x-3 shrink-0">

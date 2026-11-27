@@ -15,3 +15,21 @@ export function formatPriceCompact(value: number | string): string {
     if (n >= 1_000) return `${Math.round(n / 100) / 10}k`;
     return n.toString();
 }
+
+export type HoldExpiryState = "active" | "expired";
+
+/**
+ * Expiry state of a chatbot hold: "active" while a TENTATIVE hold has not expired,
+ * "expired" once expires_at is past and the hold was not converted (CANCELLED, or
+ * TENTATIVE not swept yet). null when the booking is not an expiring hold.
+ */
+export function holdExpiryState(
+    booking: { status: string; expires_at?: string | null },
+    now: number = Date.now()
+): HoldExpiryState | null {
+    if (!booking.expires_at) return null;
+    const expired = new Date(booking.expires_at).getTime() <= now;
+    if (booking.status === "TENTATIVE") return expired ? "expired" : "active";
+    if (booking.status === "CANCELLED" && expired) return "expired";
+    return null;
+}

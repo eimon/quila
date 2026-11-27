@@ -6,6 +6,7 @@ import { Loader2, ArrowLeft } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
+import PropertyCatalogFields from "@/components/PropertyCatalogFields";
 
 const inputCls = "w-full px-4 py-2.5 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-brand-primary/60 focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all text-sm";
 const labelCls = "block text-xs font-medium text-white/55 mb-1.5 uppercase tracking-wider";
@@ -94,6 +95,8 @@ export default function NewPropertyPage() {
                                 <p className="text-xs text-white/25 mt-1">{t('basePriceHint')}</p>
                             </div>
                         </div>
+
+                        <PropertyCatalogFields inputCls={inputCls} labelCls={labelCls} />
                     </div>
 
                     <div className="pt-4 flex items-center justify-end space-x-3 border-t border-white/[0.07]">

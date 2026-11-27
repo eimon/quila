@@ -10,6 +10,7 @@ import { useToast } from "@/context/ToastContext";
 import { useConfirm } from "@/context/ConfirmContext";
 import BookingDetailModal from "@/components/BookingDetailModal";
 import PayBookingDialog from "@/components/PayBookingDialog";
+import HoldExpiry from "@/components/HoldExpiry";
 
 const EMPTY_PROPERTIES: Property[] = [];
 const EMPTY_GUESTS: Guest[] = [];
@@ -103,11 +104,16 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
 
     const getPropertyName = (id: string) => properties.find(p => p.id === id)?.name || id.substring(0, 8);
     const getProperty = (id: string) => properties.find(p => p.id === id);
-    const getGuest = (id: string | undefined) => id ? guests.find(g => g.id === id) : undefined;
-    const getGuestName = (id: string | undefined) => {
+    const getGuest = (id: string | null | undefined) => id ? guests.find(g => g.id === id) : undefined;
+    const getGuestName = (id: string | null | undefined) => {
         if (!id) return "—";
         return guests.find(g => g.id === id)?.full_name || t('anonymous');
     };
+    // Chatbot holds have no guest yet: show the lead instead
+    const getGuestLabel = (booking: Booking) =>
+        !booking.guest_id && booking.lead_name
+            ? `${booking.lead_name} (${tBooking('lead')})`
+            : getGuestName(booking.guest_id);
 
     const handleAccept = async (booking: Booking) => {
         setLoadingId(booking.id);
@@ -189,9 +195,10 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
                                 />
                             </div>
 
-                            {/* Row 2: guest */}
-                            <div className="text-xs text-white/45 mb-2">
-                                {getGuestName(booking.guest_id)}
+                            {/* Row 2: guest + hold expiry */}
+                            <div className="text-xs text-white/45 mb-2 flex items-center gap-2">
+                                <span className="truncate">{getGuestLabel(booking)}</span>
+                                <HoldExpiry booking={booking} className="shrink-0" />
                             </div>
 
                             {/* Row 3: dates + amount */}
@@ -271,7 +278,7 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
                                             </Link>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-white/50">
-                                            {getGuestName(booking.guest_id)}
+                                            {getGuestLabel(booking)}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-white/50 font-mono">
                                             {booking.check_in}
@@ -287,6 +294,7 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
                                                 }`}>
                                                 {tEnums(`BookingStatus.${booking.status}`)}
                                             </span>
+                                            <HoldExpiry booking={booking} className="block mt-1" />
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-mono">
                                             <div className="flex flex-col items-end gap-0.5">

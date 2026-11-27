@@ -2,9 +2,11 @@
 
 import { useActionState, useEffect } from "react";
 import { Booking, Guest, Property, BookingStatus } from "@/types/api";
-import { X, Calendar, MapPin, User, Mail, Phone, CreditCard, Hash, Clock, Tag, UserPlus, Loader2, BadgeDollarSign, DollarSign } from "lucide-react";
+import { X, Calendar, MapPin, User, Mail, Phone, CreditCard, Hash, Clock, Tag, UserPlus, Loader2, BadgeDollarSign, DollarSign, Users, Hourglass, MessageCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { assignGuest, BookingFormState } from "@/actions/bookings";
+import { holdExpiryState } from "@/lib/utils";
+import HoldExpiry from "@/components/HoldExpiry";
 
 interface BookingDetailModalProps {
     booking: Booking;
@@ -106,6 +108,14 @@ export default function BookingDetailModal({ booking, property, guest, guests, o
                                 <Row icon={MapPin} label={tCommon('property')} value={property.name} />
                             )}
                             <Row icon={Tag} label={t('source')} value={tEnums(`BookingSource.${booking.source}`)} />
+                            {booking.guests != null && (
+                                <Row icon={Users} label={t('guestsCount')} value={booking.guests} />
+                            )}
+                            {holdExpiryState(booking) && (
+                                <Row icon={Hourglass} label={t('holdExpiry')} value={
+                                    <HoldExpiry booking={booking} className="text-sm" />
+                                } />
+                            )}
                             {booking.summary && (
                                 <Row icon={Hash} label={t('summary')} value={booking.summary} />
                             )}
@@ -138,6 +148,28 @@ export default function BookingDetailModal({ booking, property, guest, guests, o
                             )}
                         </div>
                     </div>
+
+                    {/* Chatbot lead */}
+                    {booking.lead_name && (
+                        <div className="px-6 pt-2">
+                            <p className="text-[10px] font-medium text-white/35 uppercase tracking-wider mb-1">{t('leadInfo')}</p>
+                            <Row icon={MessageCircle} label={t('leadName')} value={booking.lead_name} />
+                            {booking.lead_phone && (
+                                <Row icon={Phone} label={t('leadPhone')} value={
+                                    <a href={`tel:${booking.lead_phone}`} className="text-brand-primary/80 hover:text-brand-primary transition-colors">
+                                        {booking.lead_phone}
+                                    </a>
+                                } />
+                            )}
+                            {booking.lead_email && (
+                                <Row icon={Mail} label={t('leadEmail')} value={
+                                    <a href={`mailto:${booking.lead_email}`} className="text-brand-primary/80 hover:text-brand-primary transition-colors">
+                                        {booking.lead_email}
+                                    </a>
+                                } />
+                            )}
+                        </div>
+                    )}
 
                     {/* Guest contact */}
                     <div className="px-6 pb-5 pt-2">

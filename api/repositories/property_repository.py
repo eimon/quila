@@ -1,8 +1,16 @@
+from datetime import date
+
+from sqlalchemy import and_, exists
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from core.enums import BookingStatus
+from models.booking import Booking
 from models.property import Property
 from schemas.property import PropertyCreate, PropertyUpdate
 import uuid
+
+# Statuses that occupy dates (same set as BookingRepository.check_conflicts)
+BLOCKING_STATUSES = (BookingStatus.CONFIRMED, BookingStatus.TENTATIVE, BookingStatus.PAID)
 
 
 class PropertyRepository:
@@ -10,16 +18,7 @@ class PropertyRepository:
         self.db = db
 
     async def create(self, property_create: PropertyCreate, manager_id: uuid.UUID) -> Property:
-        db_property = Property(
-            name=property_create.name,
-            address=property_create.address,
-            description=property_create.description,
-            base_price=property_create.base_price,
-            latitude=property_create.latitude,
-            longitude=property_create.longitude,
-            manager_id=manager_id,
-            owner_id=property_create.owner_id
-        )
+        db_property = Property(**property_create.model_dump(), manager_id=manager_id)
         self.db.add(db_property)
         await self.db.flush()  # Flush to get DB-generated values
         await self.db.refresh(db_property)  # Refresh to load defaults
@@ -31,6 +30,36 @@ class PropertyRepository:
 
     async def get_all(self, skip: int = 0, limit: int = 100) -> list[Property]:
         result = await self.db.execute(select(Property).where(Property.is_active == True).offset(skip).limit(limit))
+        return list(result.scalars().all())
+
+    async def get_active_ordered(self) -> list[Property]:
+        """All active properties ordered by name (public catalog)."""
+        result = await self.db.execute(
+            select(Property).where(Property.is_active == True).order_by(Property.name, Property.id)
+        )
+        return list(result.scalars().all())
+
+    async def get_available(self, check_in: date, check_out: date, guests: int) -> list[Property]:
+        """Active properties with known capacity >= guests and no blocking booking
+        overlapping [check_in, check_out). One query; ordered by name."""
+        conflicting = exists().where(
+            and_(
+                Booking.property_id == Property.id,
+                Booking.status.in_(BLOCKING_STATUSES),
+                Booking.check_in < check_out,
+                Booking.check_out > check_in,
+            )
+        )
+        result = await self.db.execute(
+            select(Property)
+            .where(
+                Property.is_active == True,
+                Property.max_guests.is_not(None),
+                Property.max_guests >= guests,
+                ~conflicting,
+            )
+            .order_by(Property.name, Property.id)
+        )
         return list(result.scalars().all())
 
     async def get_by_manager(self, manager_id: uuid.UUID) -> list[Property]:

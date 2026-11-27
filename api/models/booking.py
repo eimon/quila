@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, String, Date, DateTime, ForeignKey, Text, Enum, CheckConstraint, Index, Numeric
+from sqlalchemy import Column, String, Date, DateTime, ForeignKey, Text, Enum, CheckConstraint, Index, Numeric, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
@@ -11,6 +11,7 @@ class Booking(Base):
     __tablename__ = "bookings"
     __table_args__ = (
         CheckConstraint("check_out > check_in", name="ck_bookings_checkout_after_checkin"),
+        CheckConstraint("guests > 0", name="ck_bookings_guests_positive"),
         Index("ix_bookings_property_dates", "property_id", "check_in", "check_out"),
         Index("ix_bookings_status", "status"),
     )
@@ -41,6 +42,14 @@ class Booking(Base):
     # Payment info
     paid_at = Column(Date, nullable=True)
     payment_method = Column(Enum(PaymentMethod), nullable=True)
+
+    # Chatbot hold: a TENTATIVE booking with expires_at becomes CANCELLED lazily once expired.
+    # Accepting the hold clears expires_at; cancelling keeps it (panel shows "Vencido").
+    expires_at = Column(DateTime(timezone=True), nullable=True, index=True)
+    guests = Column(Integer, nullable=True)
+    lead_name = Column(String(255), nullable=True)
+    lead_phone = Column(String(50), nullable=True)
+    lead_email = Column(String(255), nullable=True)
 
     # External sync metadata
     external_id = Column(String, nullable=True)  # ID from Airbnb/Booking

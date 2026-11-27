@@ -53,6 +53,33 @@ class PricingRuleRepository:
         )
         return list(result.scalars().all())
 
+    async def get_overlapping_for_properties(
+        self, property_ids: list[uuid.UUID], range_start: date, range_end: date
+    ) -> dict[uuid.UUID, list[PricingRule]]:
+        """`get_overlapping` for many properties in one query: {property_id: rules}.
+
+        Each list keeps the same precedence order as `get_overlapping`.
+        """
+        if not property_ids:
+            return {}
+        result = await self.db.execute(
+            select(PricingRule)
+            .where(
+                PricingRule.property_id.in_(property_ids),
+                PricingRule.start_date < range_end,
+                PricingRule.end_date >= range_start,
+            )
+            .order_by(
+                PricingRule.priority.desc(),
+                PricingRule.created_at.desc(),
+                PricingRule.id.desc(),
+            )
+        )
+        by_property: dict[uuid.UUID, list[PricingRule]] = {pid: [] for pid in property_ids}
+        for rule in result.scalars().all():
+            by_property[rule.property_id].append(rule)
+        return by_property
+
     async def update(self, rule_id: uuid.UUID, rule_update: PricingRuleUpdate) -> PricingRule | None:
         db_rule = await self.get_by_id(rule_id)
         if not db_rule:

@@ -49,6 +49,12 @@ class BookingResponse(BookingBase):
     paid_amount: Optional[Decimal] = None
     paid_at: Optional[date] = None
     payment_method: Optional[PaymentMethod] = None
+    # Chatbot hold / lead data
+    expires_at: Optional[datetime] = None
+    guests: Optional[int] = None
+    lead_name: Optional[str] = None
+    lead_phone: Optional[str] = None
+    lead_email: Optional[str] = None
     external_id: Optional[str]
     ical_url: Optional[str]
     last_synced_at: Optional[datetime]

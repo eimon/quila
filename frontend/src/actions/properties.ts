@@ -31,7 +31,45 @@ const propertySchema = z.object({
         val => (!val || val === "") ? undefined : parseFloat(val as string),
         z.number().optional()
     ),
+    // Catalog fields: blank inputs are sent as null so an edit can clear them
+    max_guests: z.preprocess(
+        val => (!val || val === "") ? null : Number(val),
+        z.number().int().min(1).nullable()
+    ),
+    amenities: z.preprocess(
+        val => {
+            const items = String(val ?? "").split(/\r?\n/).map(item => item.trim()).filter(Boolean);
+            return items.length ? items : null;
+        },
+        z.array(z.string()).nullable()
+    ),
+    check_in_time: z.preprocess(blankToNull, z.string().nullable()),
+    check_out_time: z.preprocess(blankToNull, z.string().nullable()),
+    cancellation_policy: z.preprocess(blankToNull, z.string().nullable()),
+    house_rules: z.preprocess(blankToNull, z.string().nullable()),
 });
+
+function blankToNull(val: unknown) {
+    const text = typeof val === "string" ? val.trim() : "";
+    return text === "" ? null : text;
+}
+
+function readPropertyForm(formData: FormData) {
+    return propertySchema.safeParse({
+        name: formData.get("name"),
+        address: formData.get("address"),
+        description: formData.get("description"),
+        base_price: formData.get("base_price"),
+        latitude: formData.get("latitude"),
+        longitude: formData.get("longitude"),
+        max_guests: formData.get("max_guests"),
+        amenities: formData.get("amenities"),
+        check_in_time: formData.get("check_in_time"),
+        check_out_time: formData.get("check_out_time"),
+        cancellation_policy: formData.get("cancellation_policy"),
+        house_rules: formData.get("house_rules"),
+    });
+}
 
 export type PropertyFormState = {
     error?: string;
@@ -39,14 +77,7 @@ export type PropertyFormState = {
 };
 
 export async function createProperty(prevState: PropertyFormState, formData: FormData): Promise<PropertyFormState> {
-    const validatedFields = propertySchema.safeParse({
-        name: formData.get("name"),
-        address: formData.get("address"),
-        description: formData.get("description"),
-        base_price: formData.get("base_price"),
-        latitude: formData.get("latitude"),
-        longitude: formData.get("longitude"),
-    });
+    const validatedFields = readPropertyForm(formData);
 
     if (!validatedFields.success) {
         return {
@@ -85,14 +116,7 @@ export async function updateProperty(
     prevState: PropertyFormState,
     formData: FormData
 ): Promise<PropertyFormState> {
-    const validatedFields = propertySchema.safeParse({
-        name: formData.get("name"),
-        address: formData.get("address"),
-        description: formData.get("description"),
-        base_price: formData.get("base_price"),
-        latitude: formData.get("latitude"),
-        longitude: formData.get("longitude"),
-    });
+    const validatedFields = readPropertyForm(formData);
 
     if (!validatedFields.success) {
         return {
