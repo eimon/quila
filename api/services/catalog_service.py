@@ -4,6 +4,7 @@ from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from core.time import business_today
 from models.property import Property
 from repositories.property_base_price_repository import PropertyBasePriceRepository
 from repositories.property_repository import PropertyRepository
@@ -30,7 +31,7 @@ class CatalogService:
         self.base_price_repo = PropertyBasePriceRepository(db)
 
     async def build_markdown(self, today: Optional[date] = None) -> str:
-        today = today or date.today()
+        today = today or business_today()
         properties = await self.property_repo.get_active_ordered()
         prices = await self.base_price_repo.get_at_date_for_properties([p.id for p in properties], today)
 

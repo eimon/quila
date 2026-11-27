@@ -155,9 +155,12 @@ async def test_hold_capacity_unknown(client, bot_headers, admin_headers):
     {"lead_phone": None},
     {"lead_email": "no-es-un-email"},
 ])
-async def test_hold_malformed_body_is_422(client, bot_headers, overrides):
+async def test_hold_malformed_body_is_invalid_input(client, bot_headers, overrides):
     resp = await client.post(HOLDS_URL, json={**_hold(str(uuid.uuid4())), **overrides}, headers=bot_headers)
-    assert resp.status_code == 422
+    assert resp.status_code == 200
+    assert resp.json()["ok"] is False
+    assert resp.json()["reason"] == "invalid_input"
+    assert next(iter(overrides)) in resp.json()["message"]
 
 
 # ---------- Lazy expiry ----------

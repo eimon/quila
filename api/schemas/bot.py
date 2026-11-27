@@ -2,7 +2,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import Literal, Optional
 
-from pydantic import BaseModel, EmailStr, Field, UUID4
+from pydantic import BaseModel, EmailStr, Field, UUID4, field_validator
 
 from core.enums import BotFailureReason
 
@@ -41,6 +41,14 @@ class BotHoldRequest(BotQuoteRequest):
     lead_phone: str = Field(..., min_length=3, max_length=50)
     lead_email: Optional[EmailStr] = Field(None, max_length=255)
     notes: Optional[str] = Field(None, max_length=2000)
+
+    @field_validator("lead_email", mode="before")
+    @classmethod
+    def blank_email_is_none(cls, value):
+        # LLM tool calls often send "" for an optional field they have no value for
+        if isinstance(value, str) and not value.strip():
+            return None
+        return value
 
 
 # ---------- Responses ----------

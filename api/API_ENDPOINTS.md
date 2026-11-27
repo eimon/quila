@@ -601,11 +601,14 @@ Contrato máquina a máquina para chatv2. Router separado de los endpoints con J
 **Convención de resultados:** los resultados de negocio son siempre `200 OK` (chatv2 solo ve `Tool returned HTTP <code>` en respuestas no 2xx).
 - Éxito: el body incluye `"ok": true`.
 - Falla de negocio: `{"ok": false, "reason": "<code>", "message": "<texto en español>"}`.
-- `422` solo para bodies mal formados (campo faltante, `guests` < 1, fecha no ISO, email inválido).
+- Body mal formado (JSON inválido, campo faltante, `guests` < 1, fecha no ISO, UUID o email inválido) → también `200` con `reason: "invalid_input"` y un `message` que nombra los campos inválidos, para que el bot pueda corregir los argumentos. Solo en `/bot/*`: el resto de la API sigue respondiendo `422`.
+- La clave se valida antes: sin clave válida un body mal formado responde `401` (o `503` si el bot está deshabilitado), nunca `200`.
+- `lead_email` vacío o solo espacios se trata como ausente (`null`).
 
 | `reason` | Cuándo |
 |----------|--------|
-| `invalid_dates` | `check_in` anterior a hoy (fecha del servidor) o `check_out <= check_in` |
+| `invalid_input` | Body mal formado; `message` lista los campos (ej. `check_in`) |
+| `invalid_dates` | `check_in` anterior a hoy (fecha de negocio en `BUSINESS_TIMEZONE`, por defecto `America/Argentina/Buenos_Aires`) o `check_out <= check_in` |
 | `property_not_found` | Cabaña inexistente o inactiva |
 | `capacity_unknown` | La cabaña no tiene `max_guests` cargado |
 | `over_capacity` | `guests` > `max_guests` |
@@ -696,8 +699,8 @@ chatv2 llama cada herramienta con `POST <endpoint_url>`, el JSON de argumentos c
     "parameters_schema": {
       "type": "object",
       "properties": {
-        "check_in": {"type": "string", "format": "date", "description": "Fecha de llegada, formato YYYY-MM-DD. No puede ser en el pasado."},
-        "check_out": {"type": "string", "format": "date", "description": "Fecha de salida, formato YYYY-MM-DD. Debe ser posterior a check_in (la noche de salida no se cobra)."},
+        "check_in": {"type": "string", "format": "date", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "description": "Fecha de llegada, formato YYYY-MM-DD. No puede ser en el pasado."},
+        "check_out": {"type": "string", "format": "date", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "description": "Fecha de salida, formato YYYY-MM-DD. Debe ser posterior a check_in (la noche de salida no se cobra)."},
         "guests": {"type": "integer", "minimum": 1, "maximum": 100, "description": "Cantidad de huéspedes."}
       },
       "required": ["check_in", "check_out", "guests"],
@@ -712,9 +715,9 @@ chatv2 llama cada herramienta con `POST <endpoint_url>`, el JSON de argumentos c
     "parameters_schema": {
       "type": "object",
       "properties": {
-        "property_id": {"type": "string", "format": "uuid", "description": "Id de la cabaña (property_id de search_availability)."},
-        "check_in": {"type": "string", "format": "date", "description": "Fecha de llegada, formato YYYY-MM-DD."},
-        "check_out": {"type": "string", "format": "date", "description": "Fecha de salida, formato YYYY-MM-DD."},
+        "property_id": {"type": "string", "format": "uuid", "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", "description": "Id de la cabaña (property_id de search_availability)."},
+        "check_in": {"type": "string", "format": "date", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "description": "Fecha de llegada, formato YYYY-MM-DD."},
+        "check_out": {"type": "string", "format": "date", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "description": "Fecha de salida, formato YYYY-MM-DD."},
         "guests": {"type": "integer", "minimum": 1, "maximum": 100, "description": "Cantidad de huéspedes."}
       },
       "required": ["property_id", "check_in", "check_out", "guests"],
@@ -729,9 +732,9 @@ chatv2 llama cada herramienta con `POST <endpoint_url>`, el JSON de argumentos c
     "parameters_schema": {
       "type": "object",
       "properties": {
-        "property_id": {"type": "string", "format": "uuid", "description": "Id de la cabaña elegida."},
-        "check_in": {"type": "string", "format": "date", "description": "Fecha de llegada, formato YYYY-MM-DD."},
-        "check_out": {"type": "string", "format": "date", "description": "Fecha de salida, formato YYYY-MM-DD."},
+        "property_id": {"type": "string", "format": "uuid", "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", "description": "Id de la cabaña elegida."},
+        "check_in": {"type": "string", "format": "date", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "description": "Fecha de llegada, formato YYYY-MM-DD."},
+        "check_out": {"type": "string", "format": "date", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "description": "Fecha de salida, formato YYYY-MM-DD."},
         "guests": {"type": "integer", "minimum": 1, "maximum": 100, "description": "Cantidad de huéspedes."},
         "lead_name": {"type": "string", "minLength": 1, "maxLength": 255, "description": "Nombre y apellido del huésped."},
         "lead_phone": {"type": "string", "minLength": 3, "maxLength": 50, "description": "Teléfono de contacto del huésped, idealmente con código de país."},
